@@ -68,8 +68,10 @@ typedef struct s_bomb {
 } Bomb;
 
 Bomb *addBomb(Bomb *bombList, int x, int y, int range, int timer);
+
 void deleteBomb(Bomb *oldBomb);
-void explodeBomb(Bomb *bombList, char** grid);
+
+void explodeBomb(Bomb *bombList, char **grid);
 
 void startMenu();
 
@@ -91,7 +93,7 @@ void quitGame();
 
 void setOptions();
 
-void launchGame(char **grid, Map map, int *ptrTurn);
+void launchGame(char **grid, Map map, int *ptrTurn, int vsChoice);
 
 void showLogo();
 
@@ -104,7 +106,7 @@ void printMap(char letter);
 
 void printAllMaps();
 
-void changeGrid(char **gameGrid, Map map, int *ptrTurn);
+void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice);
 
 int main() {
     printf("Bienvenu dans Bomberm...Casse briques !\n");
@@ -220,7 +222,7 @@ void startMenu() {
 
 void chooseMap() {
 
-
+    int vsChoice;
     printAllMaps();
     int turn = 1;
     int *ptrTurn = &turn;
@@ -269,7 +271,38 @@ void chooseMap() {
 //                }
 //            }
             fclose(fptr);
-            launchGame(map_1.grid, map_1, ptrTurn);
+
+
+            //Choix vs ia ou vs player //
+            blue();
+            printf("\n vs IA ou vs Player ?\n");
+            reset();
+            purple();
+            printf("1. vsIA\n");
+            reset();
+            yellow();
+            printf("2. vsPlayer\n");
+            reset();
+            scanf("%d", &vsChoice);
+
+            switch (vsChoice) {
+                case 1:
+                    launchGame(map_1.grid, map_1, ptrTurn, vsChoice);
+                    break;
+                case 2:
+                    launchGame(map_1.grid, map_1, ptrTurn, vsChoice);
+                    break;
+                default:
+                    scanf("%*[^\n]");
+                    clearTerminal();
+                    red();
+                    printf("Choix invalide\n");
+                    reset();
+                    startMenu();
+                    break;
+            }
+
+            //launchGame(map_1.grid, map_1, ptrTurn);
             for (int i = 0; i < map_1.row; i++)
                 free(map_1.grid[i]);
 
@@ -309,7 +342,35 @@ void chooseMap() {
 //                }
 //            }
             fclose(fptr);
-            launchGame(map_2.grid, map_2, ptrTurn);
+
+            blue();
+            printf("\nvs IA ou vs Player ?\n");
+            reset();
+            purple();
+            printf("1. vsIA\n");
+            reset();
+            yellow();
+            printf("2. vsPlayer\n");
+            reset();
+            scanf("%d", &vsChoice);
+
+            switch (vsChoice) {
+                case 1:
+                    launchGame(map_2.grid, map_2, ptrTurn, vsChoice);
+                    break;
+                case 2:
+                    launchGame(map_2.grid, map_2, ptrTurn, vsChoice);
+                    break;
+                default:
+                    scanf("%*[^\n]");
+                    clearTerminal();
+                    red();
+                    printf("Choix invalide\n");
+                    reset();
+                    startMenu();
+                    break;
+            }
+
             for (int i = 0; i < map_2.row; i++)
                 free(map_2.grid[i]);
             free(map_2.grid);
@@ -348,7 +409,36 @@ void chooseMap() {
 //                }
 //            }
             fclose(fptr);
-            launchGame(map_3.grid, map_3, ptrTurn);
+
+            blue();
+            //printf("\n");
+            printf("vs IA ou vs Player ?\n");
+            reset();
+            purple();
+            printf("1. vsIA\n");
+            reset();
+            yellow();
+            printf("2. vsPlayer\n");
+            reset();
+            scanf("%d", &vsChoice);
+
+            switch (vsChoice) {
+                case 1:
+                    launchGame(map_3.grid, map_3, ptrTurn, vsChoice);
+                    break;
+                case 2:
+                    launchGame(map_3.grid, map_3, ptrTurn, vsChoice);
+                    break;
+                default:
+                    scanf("%*[^\n]");
+                    clearTerminal();
+                    red();
+                    printf("Choix invalide\n");
+                    reset();
+                    startMenu();
+                    break;
+            }
+
             for (int i = 0; i < map_3.row; i++)
                 free(map_3.grid[i]);
             free(map_3.grid);
@@ -542,37 +632,76 @@ void printMap(char letter) {
 
 }
 
-void launchGame(char **grid, Map map, int *ptrTurn) {
+void launchGame(char **grid, Map map, int *ptrTurn, int vsChoice) {
 
-    //AFFICHAGE DE LA MAP CHOISIE
-    for (int i = 0; i < map.row; i++) {
-        for (int j = 0; j < map.column; j++) {
-            printMap(grid[i][j]);
-            if (j == map.column - 1) {
-                printf("\n");
+    switch (vsChoice) {
+        case 1:
+
+            //AFFICHAGE DE LA MAP CHOISIE
+            for (int i = 0; i < map.row; i++) {
+                for (int j = 0; j < map.column; j++) {
+                    printMap(grid[i][j]);
+                    if (j == map.column - 1) {
+                        printf("\n");
+                    }
+                }
             }
-        }
-    }
-    printf("\n");
-    printf("Nombre de bombes par défaut : %d\n", map.bomb);
-    //afficher les commandes du jeu
-    printf("Commandes :\n");
-    printf("1. Déplacer le joueur : Z = haut, S = bas, Q = gauche, D = droite\n");
-    printf("2. Poser une bombe : B\n");
-    printf("3. Abandonner : A\n");
-    printf("4. Finir le tour avant les 5 mouvements : P\n");
-    clearStdin();
-    clearTerminal();
-    changeGrid(grid, map, ptrTurn);
+            printf("\n");
+            printf("Nombre de bombes par défaut : %d\n", map.bomb);
+            //afficher les commandes du jeu
+            printf("Commandes :\n");
+            printf("1. Déplacer le joueur : Z = haut, S = bas, Q = gauche, D = droite\n");
+            printf("2. Poser une bombe : B\n");
+            printf("3. Abandonner : A\n");
+            printf("4. Finir le tour avant les 5 mouvements : P\n");
+            clearStdin();
+            clearTerminal();
+            changeGrid(grid, map, ptrTurn, vsChoice);
 
-    //relaunch the function
-    clearStdin();
-    clearTerminal();
-    //launchGame(grid, map, ptrTurn);
+            //relaunch the function
+            clearStdin();
+            clearTerminal();
+            //launchGame(grid, map, ptrTurn);
 
 //    for (int i = 0; i < map.row; i++)
 //        free(map.grid[i]);
 //    free(map.grid);
+
+            break;
+        case 2:
+
+            //AFFICHAGE DE LA MAP CHOISIE
+            for (int i = 0; i < map.row; i++) {
+                for (int j = 0; j < map.column; j++) {
+                    printMap(grid[i][j]);
+                    if (j == map.column - 1) {
+                        printf("\n");
+                    }
+                }
+            }
+            printf("\n");
+            printf("Nombre de bombes par défaut : %d\n", map.bomb);
+            //afficher les commandes du jeu
+            printf("Commandes :\n");
+            printf("1. Déplacer le joueur : Z = haut, S = bas, Q = gauche, D = droite\n");
+            printf("2. Poser une bombe : B\n");
+            printf("3. Abandonner : A\n");
+            printf("4. Finir le tour avant les 5 mouvements : P\n");
+            clearStdin();
+            clearTerminal();
+            changeGrid(grid, map, ptrTurn, vsChoice);
+
+            //relaunch the function
+            clearStdin();
+            clearTerminal();
+            //launchGame(grid, map, ptrTurn);
+
+//    for (int i = 0; i < map.row; i++)
+//        free(map.grid[i]);
+//    free(map.grid);
+
+            break;
+    }
 }
 
 
@@ -585,8 +714,9 @@ void quitGame() {
     exit(0);
 }
 
-void changeGrid(char **gameGrid, Map map, int *ptrTurn) {
-    Bomb* listBomb;
+void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
+
+    Bomb *listBomb;
     char choosedAction;
 //        for (int i = 0; i < map.row; i++){
 //            for (int j = 0; j < map.column; j++) {
@@ -617,255 +747,258 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn) {
     //if player choose to do something else, print "Commande invalide" and ask for another action
     int invalidMove = 0;
     char turn;
-    while (moveLeft > 0) {
-        //AFFICHAGE DE LA MAP CHOISIE
-        clearStdin();
-        clearTerminal();
 
-        for (int i = 0; i < map.row; i++) {
-            for (int j = 0; j < map.column; j++) {
-                printMap(gameGrid[i][j]);
-                if (j == map.column - 1) {
-                    printf("\n");
+    // Lance code player VS player si 2 et lance code VS ia si 1
+    switch (vsChoice) {
+        case 1: // ia
+            while (moveLeft > 0) {
+                //AFFICHAGE DE LA MAP CHOISIE
+                clearStdin();
+                clearTerminal();
+
+                for (int i = 0; i < map.row; i++) {
+                    for (int j = 0; j < map.column; j++) {
+                        printMap(gameGrid[i][j]);
+                        if (j == map.column - 1) {
+                            printf("\n");
+                        }
+                    }
                 }
-            }
-        }
-        printf("Vous avez %d mouvements restants\n", moveLeft);
-        if (invalidMove == 1) {
-            red();
-            printf("Vous ne pouvez pas vous déplacer ici\n");
-            reset();
-            invalidMove = 0;
-        }
-        printf("Joueur %d, choisissez vos actions : ", *ptrTurn);
+                printf("Vous avez %d mouvements restants\n", moveLeft);
+                if (invalidMove == 1) {
+                    red();
+                    printf("Vous ne pouvez pas vous déplacer ici\n");
+                    reset();
+                    invalidMove = 0;
+                }
+                printf("Joueur %d, choisissez vos actions : ", *ptrTurn);
 //            if(*ptrTurn == 1){
 //                turn = '1';
 //                printf("Vous êtes le joueur %c\n", turn);
 //            }else{
 //                turn = '2';
 //            }
-        switch (*ptrTurn) {
-            case 1:
-                turn = '1';
-                break;
-            case 2:
-                turn = '2';
-                break;
-            case 3:
-                turn = '3';
-                break;
-            case 4:
-                turn = '4';
-                break;
-            default:
-                break;
-        }
-
-        choosedAction = getchar();
-        printf("Action choisie : (%c)\n", choosedAction);
-        switch (toupper(choosedAction)) {
-            case 'A':
-                quitGame();
-                break;
-            case 'P':
-                printf("Vous avez fini votre tour\n");
                 switch (*ptrTurn) {
                     case 1:
-                        *ptrTurn = 2;
+                        turn = '1';
                         break;
                     case 2:
-                        if (map.players == 2) {
-                            *ptrTurn = 1;
-                        } else {
-                            *ptrTurn = 3;
-                        }
+                        turn = '2';
                         break;
                     case 3:
-                        if (map.players == 3) {
-                            *ptrTurn = 1;
-                        } else {
-                            *ptrTurn = 4;
-                        }
+                        turn = '3';
                         break;
                     case 4:
-                        *ptrTurn = 1;
+                        turn = '4';
                         break;
                     default:
                         break;
                 }
-                break;
 
-            case 'Z':
-                for (int i = 0; i < map.row; i++) {
-                    for (int j = 0; j < map.column; j++) {
-                        printf("position de recherche = %d %d\n", i, j);
-                        printf("(char)*ptrTurn = %c\n", turn);
-                        //printMap(gameGrid[i][j]);
-                        if (gameGrid[i][j] == turn) {
-                            printf("Joueur trouvé a %d %d\n", i, j);
-                            printf("COUCOU2");
-                            if (gameGrid[i - 1][j] == 'O') {
-                                gameGrid[i][j] = 'O';
-                                gameGrid[i - 1][j] = turn;
-
-                                moveLeft--;
+                choosedAction = getchar();
+                printf("Action choisie : (%c)\n", choosedAction);
+                switch (toupper(choosedAction)) {
+                    case 'A':
+                        quitGame();
+                        break;
+                    case 'P':
+                        printf("Vous avez fini votre tour\n");
+                        switch (*ptrTurn) {
+                            case 1:
+                                *ptrTurn = 2;
                                 break;
-                            } else {
-                                invalidMove = 1;
-                                break;
-                            }
-                        }
-                        //break;
-                    }
-                }
-                break;
-            case 'Q':
-                for (int i = 0; i < map.row; i++) {
-                    for (int j = 0; j < map.column; j++) {
-                        if (gameGrid[i][j] == turn) {
-                            if (gameGrid[i][j - 1] == 'O') {
-                                gameGrid[i][j] = 'O';
-                                gameGrid[i][j - 1] = turn;
-                                moveLeft--;
-                                break;
-                            } else {
-                                invalidMove = 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-                break;
-            case 'S':
-                for (int j = 0; j < map.column; j++) {
-                    for (int i = 0; i < map.row; i++) {
-
-                        if (gameGrid[i][j] == turn) {
-                            printf("Joueur trouvé a %d %d\n", i, j);
-                            if (gameGrid[i + 1][j] == 'O') {
-                                gameGrid[i][j] = 'O';
-                                gameGrid[i + 1][j] = turn;
-                                printf("DESCENDU");
-                                moveLeft--;
-                                break;
-                            } else {
-                                invalidMove = 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-                break;
-            case 'D':
-                //check all the map to find the player designated by turn
-                //if the player is found, check if the player can move to the right
-                //if he can, move him to the right case only if it's an O
-                //move him only one time, and set is previous position to O
-                //remove 1 to moveLeft
-                for (int i = 0; i < map.row; i++) {
-                    for (int j = 0; j < map.column; j++) {
-                        if (gameGrid[i][j] == turn) {
-                            printf("Joueur trouvé a %d %d\n", i, j);
-                            if (gameGrid[i][j + 1] == 'O') {
-                                gameGrid[i][j] = 'O';
-                                gameGrid[i][j + 1] = turn;
-                                printf("DROITE");
-                                moveLeft--;
-                                break;
-                            } else {
-                                invalidMove = 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-                break;
-            case 'B':
-                //check all the grid to find the player designated by turn
-                //check if the player have more than 1 moveLeft
-                //if he have more than 1 moveLeft, ask him where he want to go, change his position and set his previous position to B
-                //if the player have 1 moveLeft, printf "Vous ne pouvez pas poser de bombe"
-
-                if (moveLeft > 1) {
-                    for (int i = 0; i < map.row; i++) {
-                        for (int j = 0; j < map.column; j++) {
-                            if (gameGrid[i][j] == turn) {
-                                listBomb = addBomb(listBomb, i, j, 2, 3);
-                                printf("Choissisez une position pour vous déplacer : ");
-                                char choosedPosition;
-                                choosedPosition = getchar();
-                                printf("Position choisie : (%c)\n", choosedPosition);
-                                switch (toupper(choosedPosition)) {
-                                    case 'Z':
-                                        if (gameGrid[i - 1][j] == 'O') {
-                                            gameGrid[i][j] = 'B';
-                                            gameGrid[i - 1][j] = turn;
-                                            moveLeft--;
-                                            break;
-                                        } else {
-                                            invalidMove = 1;
-                                            break;
-                                        }
-                                        break;
-                                    case 'Q':
-                                        if (gameGrid[i][j - 1] == 'O') {
-                                            gameGrid[i][j] = 'B';
-                                            gameGrid[i][j - 1] = turn;
-                                            moveLeft--;
-                                            break;
-                                        } else {
-                                            invalidMove = 1;
-                                            break;
-                                        }
-                                        break;
-                                    case 'S':
-                                        if (gameGrid[i + 1][j] == 'O') {
-                                            gameGrid[i][j] = 'M';
-                                            gameGrid[i + 1][j] = turn;
-                                            printf("bouclefonctionnelle");
-                                            moveLeft--;
-                                            break;
-                                        } else {
-                                            invalidMove = 1;
-                                            break;
-                                        }
-                                        break;
-                                    case 'D':
-                                        if (gameGrid[i][j + 1] == 'O') {
-                                            gameGrid[i][j] = 'B';
-                                            gameGrid[i][j + 1] = turn;
-                                            moveLeft--;
-                                            break;
-                                        } else {
-                                            invalidMove = 1;
-                                            break;
-                                        }
-                                        break;
-                                    default:
-                                        break;
+                            case 2:
+                                if (map.players == 2) {
+                                    *ptrTurn = 1;
+                                } else {
+                                    *ptrTurn = 3;
                                 }
-                                //gameGrid[i][j] = 'B';
-s
-                                //moveLeft--;
                                 break;
+                            case 3:
+                                if (map.players == 3) {
+                                    *ptrTurn = 1;
+                                } else {
+                                    *ptrTurn = 4;
+                                }
+                                break;
+                            case 4:
+                                *ptrTurn = 1;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+
+                    case 'Z':
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                printf("position de recherche = %d %d\n", i, j);
+                                printf("(char)*ptrTurn = %c\n", turn);
+                                //printMap(gameGrid[i][j]);
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    printf("COUCOU2");
+                                    if (gameGrid[i - 1][j] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i - 1][j] = turn;
+
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                                //break;
                             }
                         }
-                    }
-                } else {
-                    printf("Vous ne pouvez pas poser de bombe\n");
+                        break;
+                    case 'Q':
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                if (gameGrid[i][j] == turn) {
+                                    if (gameGrid[i][j - 1] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i][j - 1] = turn;
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'S':
+                        for (int j = 0; j < map.column; j++) {
+                            for (int i = 0; i < map.row; i++) {
+
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    if (gameGrid[i + 1][j] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i + 1][j] = turn;
+                                        printf("DESCENDU");
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'D':
+                        //check all the map to find the player designated by turn
+                        //if the player is found, check if the player can move to the right
+                        //if he can, move him to the right case only if it's an O
+                        //move him only one time, and set is previous position to O
+                        //remove 1 to moveLeft
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    if (gameGrid[i][j + 1] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i][j + 1] = turn;
+                                        printf("DROITE");
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'B':
+                        //check all the grid to find the player designated by turn
+                        //check if the player have more than 1 moveLeft
+                        //if he have more than 1 moveLeft, ask him where he want to go, change his position and set his previous position to B
+                        //if the player have 1 moveLeft, printf "Vous ne pouvez pas poser de bombe"
+
+                        if (moveLeft > 1) {
+                            for (int i = 0; i < map.row; i++) {
+                                for (int j = 0; j < map.column; j++) {
+                                    if (gameGrid[i][j] == turn) {
+                                        listBomb = addBomb(listBomb, i, j, 2, 3);
+                                        printf("Choissisez une position pour vous déplacer : ");
+                                        char choosedPosition;
+                                        choosedPosition = getchar();
+                                        printf("Position choisie : (%c)\n", choosedPosition);
+                                        switch (toupper(choosedPosition)) {
+                                            case 'Z':
+                                                if (gameGrid[i - 1][j] == 'O') {
+                                                    gameGrid[i][j] = 'B';
+                                                    gameGrid[i - 1][j] = turn;
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            case 'Q':
+                                                if (gameGrid[i][j - 1] == 'O') {
+                                                    gameGrid[i][j] = 'B';
+                                                    gameGrid[i][j - 1] = turn;
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            case 'S':
+                                                if (gameGrid[i + 1][j] == 'O') {
+                                                    gameGrid[i][j] = 'M';
+                                                    gameGrid[i + 1][j] = turn;
+                                                    printf("bouclefonctionnelle");
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            case 'D':
+                                                if (gameGrid[i][j + 1] == 'O') {
+                                                    gameGrid[i][j] = 'B';
+                                                    gameGrid[i][j + 1] = turn;
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        //gameGrid[i][j] = 'B';
+                                        //moveLeft--;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            printf("Vous ne pouvez pas poser de bombe\n");
+                        }
+
+
                 }
-
-
-        }
-        explodeBomb(listBomb, gameGrid);
-    }
+                //explodeBomb(listBomb, gameGrid);
+            }
 //        for(int i = 0; i < map.row; i++){
 //            for(int j = 0; j < map.column; j++){
 //                printMap(gameGrid[i][j]);
 //                printf("ici");
 //            }
 //            printf("\n");}
-    if (moveLeft == 0) {
+            if (moveLeft == 0) {
 //            if(*ptrTurn==1){
 //                *ptrTurn = 2;
 //                changeGrid(gameGrid, map, ptrTurn);
@@ -874,105 +1007,463 @@ s
 //                *ptrTurn = 1;
 //                changeGrid(gameGrid, map, ptrTurn);
 //            }
-        switch (*ptrTurn) {
-            case 1:
-                *ptrTurn = 2;
-                changeGrid(gameGrid, map, ptrTurn);
-                break;
-            case 2:
-                if (map.players == 2) {
-                    *ptrTurn = 1;
-                } else {
-                    *ptrTurn = 3;
-                }
-                changeGrid(gameGrid, map, ptrTurn);
-                break;
-            case 3:
-                if (map.players == 3) {
-                    *ptrTurn = 1;
-                } else {
-                    *ptrTurn = 4;
-                }
-                changeGrid(gameGrid, map, ptrTurn);
-                break;
-            case 4:
-                *ptrTurn = 1;
-                changeGrid(gameGrid, map, ptrTurn);
-                break;
-            default:
-                break;
-        }
-    }
+                switch (*ptrTurn) {
+                    case 1: // Place au BOT
+                        *ptrTurn = 2;
+                        turn = '2';
+                        moveLeft=4;
+                        int posJ1x;
+                        int posJ1y;
+                        int posJ2x;
+                        int posJ2y;
+                        // déplacer le bot
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                if (gameGrid[i][j]=='1'){
+                                    posJ1x = i; // récup pos joueurs
+                                    posJ1y = j;
+                                }
+                                if (gameGrid[i][j]=='2'){
+                                    posJ2x = i; // récup pos joueurs
+                                    posJ2y = j;
+                                }
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    if (gameGrid[i][j - 1] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i][j - 1] = turn;
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        /** while (moveLeft>0){
+                            if (posJ2x>posJ1x){
+                                if (gameGrid[posJ2x][posJ2y - 1] == 'O') {
+                                    gameGrid[posJ2x][posJ2y] = 'O';
+                                    gameGrid[posJ2x][posJ2y - 1] = turn;
+                                    moveLeft--;
+                                }
+                            }
+                    } **/
 
+                        // déplace le bot d'une case à gauche
+                        /** for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                //printf("position de recherche = %d %d\n", i, j);
+                                //printf("(char)*ptrTurn = %c\n", turn);
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    if (gameGrid[i][j - 1] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i][j - 1] = turn;
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        } **/
+
+                        //turn = 1;
+                        *ptrTurn = 1;
+                        changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                        break;
+                        /** case 2:
+                            if (map.players == 2) {
+                                *ptrTurn = 1;
+                            } else {
+                                *ptrTurn = 3;
+                            }
+                            changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                            break;
+                        case 3:
+                            if (map.players == 3) {
+                                *ptrTurn = 1;
+                            } else {
+                                *ptrTurn = 4;
+                            }
+                            changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                            break;
+                        case 4:
+                            *ptrTurn = 1;
+                            changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                            break;
+                        default:
+                            break; **/
+                }
+            }
+            break;
+
+
+        case 2: // player
+
+            while (moveLeft > 0) {
+                //AFFICHAGE DE LA MAP CHOISIE
+                clearStdin();
+                clearTerminal();
+
+                for (int i = 0; i < map.row; i++) {
+                    for (int j = 0; j < map.column; j++) {
+                        printMap(gameGrid[i][j]);
+                        if (j == map.column - 1) {
+                            printf("\n");
+                        }
+                    }
+                }
+                printf("Vous avez %d mouvements restants\n", moveLeft);
+                if (invalidMove == 1) {
+                    red();
+                    printf("Vous ne pouvez pas vous déplacer ici\n");
+                    reset();
+                    invalidMove = 0;
+                }
+                printf("Joueur %d, choisissez vos actions : ", *ptrTurn);
+//            if(*ptrTurn == 1){
+//                turn = '1';
+//                printf("Vous êtes le joueur %c\n", turn);
+//            }else{
+//                turn = '2';
+//            }
+                switch (*ptrTurn) {
+                    case 1:
+                        turn = '1';
+                        break;
+                    case 2:
+                        turn = '2';
+                        break;
+                    case 3:
+                        turn = '3';
+                        break;
+                    case 4:
+                        turn = '4';
+                        break;
+                    default:
+                        break;
+                }
+
+                choosedAction = getchar();
+                printf("Action choisie : (%c)\n", choosedAction);
+                switch (toupper(choosedAction)) {
+                    case 'A':
+                        quitGame();
+                        break;
+                    case 'P':
+                        printf("Vous avez fini votre tour\n");
+                        switch (*ptrTurn) {
+                            case 1:
+                                *ptrTurn = 2;
+                                break;
+                            case 2:
+                                if (map.players == 2) {
+                                    *ptrTurn = 1;
+                                } else {
+                                    *ptrTurn = 3;
+                                }
+                                break;
+                            case 3:
+                                if (map.players == 3) {
+                                    *ptrTurn = 1;
+                                } else {
+                                    *ptrTurn = 4;
+                                }
+                                break;
+                            case 4:
+                                *ptrTurn = 1;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+
+                    case 'Z':
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                printf("position de recherche = %d %d\n", i, j);
+                                printf("(char)*ptrTurn = %c\n", turn);
+                                //printMap(gameGrid[i][j]);
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    printf("COUCOU2");
+                                    if (gameGrid[i - 1][j] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i - 1][j] = turn;
+
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                                //break;
+                            }
+                        }
+                        break;
+                    case 'Q':
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                if (gameGrid[i][j] == turn) {
+                                    if (gameGrid[i][j - 1] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i][j - 1] = turn;
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'S':
+                        for (int j = 0; j < map.column; j++) {
+                            for (int i = 0; i < map.row; i++) {
+
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    if (gameGrid[i + 1][j] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i + 1][j] = turn;
+                                        printf("DESCENDU");
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'D':
+                        //check all the map to find the player designated by turn
+                        //if the player is found, check if the player can move to the right
+                        //if he can, move him to the right case only if it's an O
+                        //move him only one time, and set is previous position to O
+                        //remove 1 to moveLeft
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                if (gameGrid[i][j] == turn) {
+                                    printf("Joueur trouvé a %d %d\n", i, j);
+                                    if (gameGrid[i][j + 1] == 'O') {
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i][j + 1] = turn;
+                                        printf("DROITE");
+                                        moveLeft--;
+                                        break;
+                                    } else {
+                                        invalidMove = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'B':
+                        //check all the grid to find the player designated by turn
+                        //check if the player have more than 1 moveLeft
+                        //if he have more than 1 moveLeft, ask him where he want to go, change his position and set his previous position to B
+                        //if the player have 1 moveLeft, printf "Vous ne pouvez pas poser de bombe"
+
+                        if (moveLeft > 1) {
+                            for (int i = 0; i < map.row; i++) {
+                                for (int j = 0; j < map.column; j++) {
+                                    if (gameGrid[i][j] == turn) {
+                                        listBomb = addBomb(listBomb, i, j, 2, 3);
+                                        printf("Choissisez une position pour vous déplacer : ");
+                                        char choosedPosition;
+                                        choosedPosition = getchar();
+                                        printf("Position choisie : (%c)\n", choosedPosition);
+                                        switch (toupper(choosedPosition)) {
+                                            case 'Z':
+                                                if (gameGrid[i - 1][j] == 'O') {
+                                                    gameGrid[i][j] = 'B';
+                                                    gameGrid[i - 1][j] = turn;
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            case 'Q':
+                                                if (gameGrid[i][j - 1] == 'O') {
+                                                    gameGrid[i][j] = 'B';
+                                                    gameGrid[i][j - 1] = turn;
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            case 'S':
+                                                if (gameGrid[i + 1][j] == 'O') {
+                                                    gameGrid[i][j] = 'M';
+                                                    gameGrid[i + 1][j] = turn;
+                                                    printf("bouclefonctionnelle");
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            case 'D':
+                                                if (gameGrid[i][j + 1] == 'O') {
+                                                    gameGrid[i][j] = 'B';
+                                                    gameGrid[i][j + 1] = turn;
+                                                    moveLeft--;
+                                                    break;
+                                                } else {
+                                                    invalidMove = 1;
+                                                    break;
+                                                }
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        //gameGrid[i][j] = 'B';
+                                        //moveLeft--;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            printf("Vous ne pouvez pas poser de bombe\n");
+                        }
+
+
+                }
+                //explodeBomb(listBomb, gameGrid);
+            }
+//        for(int i = 0; i < map.row; i++){
+//            for(int j = 0; j < map.column; j++){
+//                printMap(gameGrid[i][j]);
+//                printf("ici");
+//            }
+//            printf("\n");}
+            if (moveLeft == 0) {
+//            if(*ptrTurn==1){
+//                *ptrTurn = 2;
+//                changeGrid(gameGrid, map, ptrTurn);
+//            }
+//            else if(*ptrTurn==2){
+//                *ptrTurn = 1;
+//                changeGrid(gameGrid, map, ptrTurn);
+//            }
+                switch (*ptrTurn) {
+                    case 1:
+                        *ptrTurn = 2;
+                        changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                        break;
+                    case 2:
+                        if (map.players == 2) {
+                            *ptrTurn = 1;
+                        } else {
+                            *ptrTurn = 3;
+                        }
+                        changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                        break;
+                    case 3:
+                        if (map.players == 3) {
+                            *ptrTurn = 1;
+                        } else {
+                            *ptrTurn = 4;
+                        }
+                        changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                        break;
+                    case 4:
+                        *ptrTurn = 1;
+                        changeGrid(gameGrid, map, ptrTurn, vsChoice);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+
+    }
 }
 
-void explodeBomb(Bomb *bombList, char** grid){
-    Bomb* currentBomb = bombList;
-    while(currentBomb != NULL){
-        if(currentBomb->timer == 0){
+void explodeBomb(Bomb *bombList, char **grid) {
+    Bomb *currentBomb = bombList;
+    while (currentBomb != NULL) {
+        if (currentBomb->timer == 0) {
             grid[currentBomb->x][currentBomb->y] = 'O';
             //check 2 case to the left right up and down, if it's a X stop, if it's a M set is to O, if it's 1 2 3 or 4 set it to O
 
             //check left
-            for(int i = 1; i <= currentBomb->range; i++){
-                if(grid[currentBomb->x][currentBomb->y - i] == 'X'){
+            for (int i = 1; i <= currentBomb->range; i++) {
+                if (grid[currentBomb->x][currentBomb->y - i] == 'X') {
                     break;
-                }
-                else if(grid[currentBomb->x][currentBomb->y - i] == 'M'){
+                } else if (grid[currentBomb->x][currentBomb->y - i] == 'M') {
                     grid[currentBomb->x][currentBomb->y - i] = 'O';
                     break;
-                }
-                else if(grid[currentBomb->x][currentBomb->y - i] == '1' || grid[currentBomb->x][currentBomb->y - i] == '2' || grid[currentBomb->x][currentBomb->y - i] == '3' || grid[currentBomb->x][currentBomb->y - i] == '4'){
+                } else if (grid[currentBomb->x][currentBomb->y - i] == '1' ||
+                           grid[currentBomb->x][currentBomb->y - i] == '2' ||
+                           grid[currentBomb->x][currentBomb->y - i] == '3' ||
+                           grid[currentBomb->x][currentBomb->y - i] == '4') {
                     grid[currentBomb->x][currentBomb->y - i] = 'O';
                     break;
                 }
             }
             //check right
-            for(int i = 1; i <= currentBomb->range; i++){
-                if(grid[currentBomb->x][currentBomb->y + i] == 'X'){
+            for (int i = 1; i <= currentBomb->range; i++) {
+                if (grid[currentBomb->x][currentBomb->y + i] == 'X') {
                     break;
-                }
-                else if(grid[currentBomb->x][currentBomb->y + i] == 'M'){
+                } else if (grid[currentBomb->x][currentBomb->y + i] == 'M') {
                     grid[currentBomb->x][currentBomb->y + i] = 'O';
                     break;
-                }
-                else if(grid[currentBomb->x][currentBomb->y + i] == '1' || grid[currentBomb->x][currentBomb->y + i] == '2' || grid[currentBomb->x][currentBomb->y + i] == '3' || grid[currentBomb->x][currentBomb->y + i] == '4'){
+                } else if (grid[currentBomb->x][currentBomb->y + i] == '1' ||
+                           grid[currentBomb->x][currentBomb->y + i] == '2' ||
+                           grid[currentBomb->x][currentBomb->y + i] == '3' ||
+                           grid[currentBomb->x][currentBomb->y + i] == '4') {
                     grid[currentBomb->x][currentBomb->y + i] = 'O';
                     break;
                 }
             }
             //check up
-            for(int i = 1; i <= currentBomb->range; i++){
-                if(grid[currentBomb->x - i][currentBomb->y] == 'X'){
+            for (int i = 1; i <= currentBomb->range; i++) {
+                if (grid[currentBomb->x - i][currentBomb->y] == 'X') {
                     break;
-                }
-                else if(grid[currentBomb->x - i][currentBomb->y] == 'M'){
+                } else if (grid[currentBomb->x - i][currentBomb->y] == 'M') {
                     grid[currentBomb->x - i][currentBomb->y] = 'O';
                     break;
-                }
-                else if(grid[currentBomb->x - i][currentBomb->y] == '1' || grid[currentBomb->x - i][currentBomb->y] == '2' || grid[currentBomb->x - i][currentBomb->y] == '3' || grid[currentBomb->x - i][currentBomb->y] == '4'){
+                } else if (grid[currentBomb->x - i][currentBomb->y] == '1' ||
+                           grid[currentBomb->x - i][currentBomb->y] == '2' ||
+                           grid[currentBomb->x - i][currentBomb->y] == '3' ||
+                           grid[currentBomb->x - i][currentBomb->y] == '4') {
                     grid[currentBomb->x - i][currentBomb->y] = 'O';
                     break;
                 }
             }
             //check down
-            for(int i = 1; i <= currentBomb->range; i++){
-                if(grid[currentBomb->x + i][currentBomb->y] == 'X'){
+            for (int i = 1; i <= currentBomb->range; i++) {
+                if (grid[currentBomb->x + i][currentBomb->y] == 'X') {
                     break;
-                }
-                else if(grid[currentBomb->x + i][currentBomb->y] == 'M'){
+                } else if (grid[currentBomb->x + i][currentBomb->y] == 'M') {
                     grid[currentBomb->x + i][currentBomb->y] = 'O';
                     break;
-                }
-                else if(grid[currentBomb->x + i][currentBomb->y] == '1' || grid[currentBomb->x + i][currentBomb->y] == '2' || grid[currentBomb->x + i][currentBomb->y] == '3' || grid[currentBomb->x + i][currentBomb->y] == '4'){
+                } else if (grid[currentBomb->x + i][currentBomb->y] == '1' ||
+                           grid[currentBomb->x + i][currentBomb->y] == '2' ||
+                           grid[currentBomb->x + i][currentBomb->y] == '3' ||
+                           grid[currentBomb->x + i][currentBomb->y] == '4') {
                     grid[currentBomb->x + i][currentBomb->y] = 'O';
                     break;
                 }
             }
 
             currentBomb = currentBomb->next;
-        }
-        else{
+        } else {
             currentBomb->timer--;
             currentBomb = currentBomb->next;
         }
