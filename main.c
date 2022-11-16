@@ -119,6 +119,7 @@ void print_image(FILE *pFile);
 
 void chooseMap();
 
+void multijoueur();
 
 void printMap(char letter);
 
@@ -200,18 +201,20 @@ void clearStdin() {
 void startMenu() {
     showLogo();
     green();
-    printf("1. Jouer\n");
+    printf("1. Jouer (local)\n");
     reset();
-    printf("\u25A0 \u25A0 \u25A0 \u25A0 \u25A0\n");
+    /**printf("\u25A0 \u25A0 \u25A0 \u25A0 \u25A0\n");
     printf("\u25A0 \u24e7 \u25A5 \u2297 \u25A0\n");
     printf("\u25A0 \u24e7 \u25A5  2\u25A0\n");
     printf("\u25A0 \u25A0 \u25A0 \u25A0 \u25A0\n");
-    printf("coeur : \u2661 \u2665 \n");
-
+    printf("coeur : \u2661 \u2665 \n");**/
+    purple();
+    printf("2. Jouer (serveur)\n");
+    reset();
     yellow();
-    printf("2. Options\n");
+    printf("3. Options\n");
     red();
-    printf("3. Quitter\n");
+    printf("4. Quitter\n");
     reset();
 
     int choice;
@@ -222,9 +225,12 @@ void startMenu() {
             chooseMap();
             break;
         case 2:
-            setOptions();
+            multijoueur();
             break;
         case 3:
+            setOptions();
+            break;
+        case 4:
             quitGame();
             break;
         default:
@@ -238,6 +244,47 @@ void startMenu() {
 
     }
 
+}
+
+void multijoueur() {
+    blue();
+    printf("1. Démarrer serveur\n");
+    green();
+    printf("2. Rejoindre serveur\n");
+    reset();
+
+    int choice;
+    int ip;
+    int port;
+    scanf("%d", &choice);
+    clearTerminal();
+    switch (choice) {
+        case 1:
+            blue();
+            printf("Saisir le port assigné\n");
+            scanf("%d", &port);
+            printf("Port assigné %d\n", port);
+            reset();
+            break;
+        case 2:
+            green();
+            printf("Saisir le port assigné\n");
+            scanf("%d", &port);
+            printf("Port assigné %d\n", port);
+            printf("Saisir l'ip'\n");
+            scanf("%d", &ip);
+            printf("ip : %d\n", port);
+            reset();
+            break;
+        default:
+            scanf("%*[^\n]");
+            clearTerminal();
+            red();
+            printf("Choix invalide\n");
+            reset();
+            startMenu();
+            break;
+    }
 }
 
 void chooseMap() {
@@ -832,6 +879,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
     //if player choose to do something else, print "Commande invalide" and ask for another action
     int invalidMove = 0;
     char turn;
+    int counter = 0;
 
     // Lance code player VS player si 2 et lance code VS ia si 1
     switch (vsChoice) {
@@ -888,7 +936,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                         break;
                     case 'P':
                         printf("Vous avez fini votre tour\n");
-                        switch (*ptrTurn) {
+                        /**switch (*ptrTurn) {
                             case 1:
                                 *ptrTurn = 2;
                                 break;
@@ -911,7 +959,8 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                 break;
                             default:
                                 break;
-                        }
+                        }**/
+                        moveLeft=0;
                         break;
 
                     case 'Z':
@@ -942,7 +991,12 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                         for (int i = 0; i < map.row; i++) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
-                                    if (gameGrid[i][j - 1] == 'O') {
+                                    if (j == 0) { // traverse mur
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i - 1][map.column -1] = turn;
+                                        moveLeft--;
+                                        break;
+                                    } else if (gameGrid[i][j - 1] == 'O') {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i][j - 1] = turn;
                                         moveLeft--;
@@ -985,7 +1039,13 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
                                     //printf("Joueur trouvé a %d %d\n", i, j);
-                                    if (gameGrid[i][j + 1] == 'O') {
+                                    if (j == map.column-1) { // traverse le mur
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i + 1][map.column-map.column] = turn;
+                                        moveLeft--;
+                                        counter = 1;
+                                        break;
+                                    } else if ((gameGrid[i][j + 1] == 'O') && counter ==0) {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i][j + 1] = turn;
                                         //printf("DROITE");
@@ -998,7 +1058,9 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                 }
                             }
                         }
+                        counter =0;
                         break;
+
                     case 'B':
                         if (moveLeft > 1) {
                             printf("Choisissez votre déplacement : ");
@@ -1118,6 +1180,8 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
 //            }
                 switch (*ptrTurn) {
                     case 1: // Place au BOT
+                        printf("decreaseddelamort\n");
+                        //decreaseBombTimer(ListeDesBombes, gameGrid);
                         *ptrTurn = 2;
                         turn = '2';
                         moveLeft=4;
@@ -1152,6 +1216,8 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
                                                 gameGrid[posJ2x - 1][posJ2y -1] = turn;
                                                 printf("bombe 1");
+                                                //printf("decrTETS\n");
+                                                //decreaseBombTimer(ListeDesBombes, gameGrid);
                                                 moveLeft = 0;
                                             }else if ((gameGrid[posJ2x - 1][posJ2y] == 'O') && (gameGrid[posJ2x -1][posJ2y +1] == 'O')) {
                                                 gameGrid[posJ2x][posJ2y] = 'B';
@@ -1237,8 +1303,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                         }
                                     }
                                         //explodeBomb(listBomb, gameGrid); // fait exploser les bombes
-                                        printf("decreased\n");
-                                        decreaseBombTimer(ListeDesBombes, gameGrid);
+
 
                                     }
                                     /** if (gameGrid[i][j] == turn) {
@@ -1256,6 +1321,8 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
 
                                 }
                             }
+                            printf("decreaseddelamort\n");
+                            //decreaseBombTimer(ListeDesBombes, gameGrid);
                         /** while (moveLeft > 0){
                             if (gameGrid[posJ2x][posJ2y] == turn) {
                                 //printf("Joueur trouvé a %d %d\n", i, j);
