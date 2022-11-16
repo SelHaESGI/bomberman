@@ -121,6 +121,8 @@ void chooseMap();
 
 void multijoueur();
 
+void randomMap();
+
 void printMap(char letter);
 
 void printAllMaps();
@@ -216,6 +218,9 @@ void startMenu() {
     red();
     printf("4. Quitter\n");
     reset();
+    blue();
+    printf("5. Map random (marche pas encore)\n");
+    reset();
 
     int choice;
     scanf("%d", &choice);
@@ -233,6 +238,9 @@ void startMenu() {
         case 4:
             quitGame();
             break;
+        case 5:
+            randomMap();
+            break;
         default:
             scanf("%*[^\n]");
             clearTerminal();
@@ -244,6 +252,31 @@ void startMenu() {
 
     }
 
+}
+
+void randomMap() {
+    int l;
+    int L;
+    printf("Entrer taille tableau l et L\n");
+    printf("Longeur : \n");
+    scanf("%d", &l);
+    printf("Largeur : \n");
+    scanf("%d", &L);
+    clearTerminal();
+    int Tab[l][L];
+    for (int i =0; i < l; i++) {
+        for (int j = 0; j < L; j++) {
+            if ((i == 0) || (j == 0)) {
+                Tab[i][j] == 'X';
+            } else if ((i == l) || (j == L)) {
+                Tab[i][j] = 'X';
+            }
+            else {
+                Tab[i][j] == 'O';
+            }
+            printf("%c",Tab[i][j]);
+        }
+    }
 }
 
 void multijoueur() {
@@ -1540,7 +1573,12 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                         for (int i = 0; i < map.row; i++) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
-                                    if (gameGrid[i][j - 1] == 'O') {
+                                    if (j == 0) { // traverse mur
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i - 1][map.column -1] = turn;
+                                        moveLeft--;
+                                        break;
+                                    } else if (gameGrid[i][j - 1] == 'O') {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i][j - 1] = turn;
                                         moveLeft--;
@@ -1583,10 +1621,16 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
                                     printf("Joueur trouvé a %d %d\n", i, j);
-                                    if (gameGrid[i][j + 1] == 'O') {
+                                    if (j == map.column-1) { // traverse le mur
+                                        gameGrid[i][j] = 'O';
+                                        gameGrid[i + 1][map.column-map.column] = turn;
+                                        moveLeft--;
+                                        counter = 1;
+                                        break;
+                                    } else if ((gameGrid[i][j + 1] == 'O') && counter ==0) {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i][j + 1] = turn;
-                                        printf("DROITE");
+                                        //printf("DROITE");
                                         moveLeft--;
                                         break;
                                     } else {
@@ -1596,6 +1640,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                 }
                             }
                         }
+                        counter =0;
                         break;
                     case 'B':
                         if (moveLeft > 1) {
