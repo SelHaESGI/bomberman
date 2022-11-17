@@ -1518,8 +1518,8 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                         break;
 
                     case 'Z':
-                        for (int i = 0; i < map.row; i++) {
-                            for (int j = 0; j < map.column; j++) {
+                        for (int j = 0; j < map.column; j++) {
+                            for (int i = 0; i < map.row; i++) {
                                 //printf("position de recherche = %d %d\n", i, j);
                                 //printf("(char)*ptrTurn = %c\n", turn);
                                 //printMap(gameGrid[i][j]);
