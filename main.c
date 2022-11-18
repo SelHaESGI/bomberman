@@ -88,10 +88,14 @@ struct Liste {
 
 //void explodeBomb(Bomb *bombList, char **grid);
 
-Liste* init();
-void insertBomb(Liste* liste, int x, int y, int timer, int range);
-void decreaseBombTimer(Liste* liste, char** gameGrid);
+Liste *init();
+
+void insertBomb(Liste *liste, int x, int y, int timer, int range);
+
+void decreaseBombTimer(Liste *liste, char **gameGrid);
+
 void explodeBomb(Liste *liste, char **gameGrid);
+
 void deleteBomb(Liste *liste);
 
 void startMenu();
@@ -267,17 +271,16 @@ void randomMap() {
     scanf("%d", &L);
     clearTerminal();
     int Tab[l][L];
-    for (int i =0; i < l; i++) {
+    for (int i = 0; i < l; i++) {
         for (int j = 0; j < L; j++) {
             if ((i == 0) || (j == 0)) {
                 Tab[i][j] == 'X';
             } else if ((i == l) || (j == L)) {
                 Tab[i][j] = 'X';
-            }
-            else {
+            } else {
                 Tab[i][j] == 'O';
             }
-            printf("%c",Tab[i][j]);
+            printf("%c", Tab[i][j]);
         }
     }
 }
@@ -318,7 +321,7 @@ void multijoueur() {
             servAddr.sin_addr.s_addr = INADDR_ANY;
 
             // bind socket to the specified IP and port
-            bind(servSockD, (struct sockaddr*)&servAddr,
+            bind(servSockD, (struct sockaddr *) &servAddr,
                  sizeof(servAddr));
 
             // listen for connections
@@ -351,14 +354,12 @@ void multijoueur() {
             servAddr.sin_addr.s_addr = INADDR_ANY; // ip // INADDR_ANY
 
             int connectStatus
-                    = connect(sockD, (struct sockaddr*)&servAddr,
+                    = connect(sockD, (struct sockaddr *) &servAddr,
                               sizeof(servAddr));
 
             if (connectStatus == -1) {
                 printf("Error...\n");
-            }
-
-            else {
+            } else {
                 char strData[255];
 
                 recv(sockD, strData, sizeof(strData), 0);
@@ -1062,20 +1063,19 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                 if (gameGrid[i][j] == turn) {
                                     //printf("Joueur trouvé a %d %d\n", i, j);
                                     //printf("COUCOU2");
-                                    if (i==0){
-                                        if (gameGrid[map.row-1][j] == 'O'){
+                                    if (i == 0) {
+                                        if (gameGrid[map.row - 1][j] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[map.row-1][j] = turn;
+                                            gameGrid[map.row - 1][j] = turn;
                                             moveLeft--;
                                             //printf("COUCOU2vjri");
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
-                                    }
-                                    else if (gameGrid[i - 1][j] == 'O') {
+                                    } else if (gameGrid[i - 1][j] == 'O') {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i - 1][j] = turn;
 
@@ -1095,13 +1095,13 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
                                     if (j == 0) { // traverse mur
-                                        if (gameGrid[i][map.column-1] == 'O'){
+                                        if (gameGrid[i][map.column - 1] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[i][map.column-1] = turn;
+                                            gameGrid[i][map.column - 1] = turn;
                                             moveLeft--;
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
@@ -1124,19 +1124,18 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
 
                                 if (gameGrid[i][j] == turn) {
                                     //printf("Joueur trouvé a %d %d\n", i, j);
-                                    if (i==map.row-1){
-                                        if (gameGrid[map.row-map.row][j] == 'O'){
+                                    if (i == map.row - 1) {
+                                        if (gameGrid[map.row - map.row][j] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[map.row-map.row][j] = turn;
+                                            gameGrid[map.row - map.row][j] = turn;
                                             moveLeft--;
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
-                                    }
-                                    else if (gameGrid[i + 1][j] == 'O') {
+                                    } else if (gameGrid[i + 1][j] == 'O') {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i + 1][j] = turn;
                                         printf("DESCENDU");
@@ -1160,14 +1159,14 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
                                     printf("Joueur trouvé a %d %d\n", i, j);
-                                    if (j == map.column-1) { // traverse le mur
-                                        if (gameGrid[i][map.column-map.column] == 'O'){
+                                    if (j == map.column - 1) { // traverse le mur
+                                        if (gameGrid[i][map.column - map.column] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[i][map.column-map.column] = turn;
+                                            gameGrid[i][map.column - map.column] = turn;
                                             moveLeft--;
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
@@ -1201,7 +1200,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i - 1][j] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
                                                     gameGrid[i - 1][j] = turn;
 
                                                     moveLeft--;
@@ -1221,7 +1220,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i][j - 1] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
                                                     gameGrid[i][j - 1] = turn;
                                                     moveLeft--;
                                                     break;
@@ -1241,7 +1240,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i + 1][j] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
                                                     gameGrid[i + 1][j] = turn;
                                                     moveLeft--;
                                                     break;
@@ -1260,7 +1259,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i][j + 1] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
 
                                                     gameGrid[i][j + 1] = turn;
                                                     moveLeft--;
@@ -1308,69 +1307,74 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                         //decreaseBombTimer(ListeDesBombes, gameGrid);
                         *ptrTurn = 2;
                         turn = '2';
-                        moveLeft=4;
+                        moveLeft = 4;
                         int posJ1x;
                         int posJ1y;
                         int posJ2x;
                         int posJ2y;
-                            // déplacer le bot
-                            for (int i = 0; i < map.row; i++) {
-                                for (int j = 0; j < map.column; j++) {
-                                    if (gameGrid[i][j]=='1'){
-                                        posJ1x = i; // récup pos joueurs
-                                        posJ1y = j;
-                                    }
-                                    if (gameGrid[i][j]=='2'){
-                                        posJ2x = i; // récup pos joueurs
-                                        posJ2y = j;
-                                    }
+                        // déplacer le bot
+                        for (int i = 0; i < map.row; i++) {
+                            for (int j = 0; j < map.column; j++) {
+                                if (gameGrid[i][j] == '1') {
+                                    posJ1x = i; // récup pos joueurs
+                                    posJ1y = j;
+                                }
+                                if (gameGrid[i][j] == '2') {
+                                    posJ2x = i; // récup pos joueurs
+                                    posJ2y = j;
+                                }
 
-                                    if (gameGrid[i][j] == turn) {
+                                if (gameGrid[i][j] == turn) {
                                     while (moveLeft > 0) { // bouge vers le joueur tant qu'il y a des moubLeft
                                         if (moveLeft > 2) {
-                                        if ((gameGrid[posJ2x - 1][posJ2y ] == '1') || // pose une bombe si distance joueur = 1
-                                            (gameGrid[posJ2x][posJ2y - 1] == '1') ||
-                                            (gameGrid[posJ2x + 1][posJ2y ] == '1') ||
-                                            (gameGrid[posJ2x][posJ2y  + 1] == '1')) {
-                                            //listBomb = addBomb(listBomb, posJ2y, posJ2x, 2, 3);
+                                            if ((gameGrid[posJ2x - 1][posJ2y] == '1') ||
+                                                // pose une bombe si distance joueur = 1
+                                                (gameGrid[posJ2x][posJ2y - 1] == '1') ||
+                                                (gameGrid[posJ2x + 1][posJ2y] == '1') ||
+                                                (gameGrid[posJ2x][posJ2y + 1] == '1')) {
+                                                //listBomb = addBomb(listBomb, posJ2y, posJ2x, 2, 3);
 
-                                            if ((gameGrid[posJ2x - 1][posJ2y] == 'O') && (gameGrid[posJ2x -1][posJ2y -1] == 'O')) {
-                                                gameGrid[posJ2x][posJ2y] = 'B';
-                                                //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                gameGrid[posJ2x - 1][posJ2y -1] = turn;
-                                                printf("bombe 1");
-                                                //printf("decrTETS\n");
-                                                //decreaseBombTimer(ListeDesBombes, gameGrid);
-                                                moveLeft = 0;
-                                            }else if ((gameGrid[posJ2x - 1][posJ2y] == 'O') && (gameGrid[posJ2x -1][posJ2y +1] == 'O')) {
-                                                gameGrid[posJ2x][posJ2y] = 'B';
-                                                //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                gameGrid[posJ2x - 1][posJ2y +1] = turn;
-                                                printf("bombe 2");
-                                                moveLeft = 0;
-                                            }else if ((gameGrid[posJ2x + 1][posJ2y] == 'O') && (gameGrid[posJ2x +1][posJ2y -1] == 'O')) {
-                                                gameGrid[posJ2x][posJ2y] = 'B';
-                                                //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                gameGrid[posJ2x + 1][posJ2y -1] = turn;
-                                                printf("bombe 3");
-                                                moveLeft = 0;
-                                            }else if ((gameGrid[posJ2x + 1][posJ2y] == 'O') && (gameGrid[posJ2x +1][posJ2y +1] == 'O')) {
-                                                gameGrid[posJ2x][posJ2y] = 'B';
-                                                //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                gameGrid[posJ2x + 1][posJ2y +1] = turn;
-                                                printf("bombe 4");
-                                                moveLeft = 0;
+                                                if ((gameGrid[posJ2x - 1][posJ2y] == 'O') &&
+                                                    (gameGrid[posJ2x - 1][posJ2y - 1] == 'O')) {
+                                                    gameGrid[posJ2x][posJ2y] = 'B';
+                                                    //listBomb = addBomb(listBomb, i, j, 2, 3);
+                                                    insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                    gameGrid[posJ2x - 1][posJ2y - 1] = turn;
+                                                    printf("bombe 1");
+                                                    //printf("decrTETS\n");
+                                                    //decreaseBombTimer(ListeDesBombes, gameGrid);
+                                                    moveLeft = 0;
+                                                } else if ((gameGrid[posJ2x - 1][posJ2y] == 'O') &&
+                                                           (gameGrid[posJ2x - 1][posJ2y + 1] == 'O')) {
+                                                    gameGrid[posJ2x][posJ2y] = 'B';
+                                                    //listBomb = addBomb(listBomb, i, j, 2, 3);
+                                                    insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                    gameGrid[posJ2x - 1][posJ2y + 1] = turn;
+                                                    printf("bombe 2");
+                                                    moveLeft = 0;
+                                                } else if ((gameGrid[posJ2x + 1][posJ2y] == 'O') &&
+                                                           (gameGrid[posJ2x + 1][posJ2y - 1] == 'O')) {
+                                                    gameGrid[posJ2x][posJ2y] = 'B';
+                                                    //listBomb = addBomb(listBomb, i, j, 2, 3);
+                                                    insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                    gameGrid[posJ2x + 1][posJ2y - 1] = turn;
+                                                    printf("bombe 3");
+                                                    moveLeft = 0;
+                                                } else if ((gameGrid[posJ2x + 1][posJ2y] == 'O') &&
+                                                           (gameGrid[posJ2x + 1][posJ2y + 1] == 'O')) {
+                                                    gameGrid[posJ2x][posJ2y] = 'B';
+                                                    //listBomb = addBomb(listBomb, i, j, 2, 3);
+                                                    insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                    gameGrid[posJ2x + 1][posJ2y + 1] = turn;
+                                                    printf("bombe 4");
+                                                    moveLeft = 0;
+                                                }
+
+
+                                                printf("Je suis la et je t'observe \n");
+                                                //moveLeft = 0;
+                                                break;
                                             }
-
-
-                                            printf("Je suis la et je t'observe \n");
-                                            //moveLeft = 0;
-                                            break;
-                                        }
                                         }
                                         if (posJ2x > posJ1x) {
                                             //printf("Joueur trouvé a %d %d\n", i, j);
@@ -1379,26 +1383,31 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 gameGrid[posJ2x - 1][posJ2y] = turn;
                                                 posJ2x--;
                                                 moveLeft--;
-                                            } else if((gameGrid[posJ2x - 1][posJ2y] == 'M') && (gameGrid[posJ2x + 1][posJ2y] == 'O') && (gameGrid[posJ2x + 1][posJ2y+1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
-                                                        gameGrid[posJ2x][posJ2y] = 'O';
-                                                        gameGrid[posJ2x + 1][posJ2y+1] = turn;
-                                                        gameGrid[posJ2x][posJ2y] = 'B';
-                                                        insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                        printf("bombe 5");
-                                                        posJ2x++;
-                                                        posJ2y++;
-                                                        moveLeft = 0;
-                                            } else if ((gameGrid[posJ2x - 1][posJ2y] == 'M') && (gameGrid[posJ2x + 1][posJ2y] == 'O') && (gameGrid[posJ2x + 1][posJ2y-1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                            } else if ((gameGrid[posJ2x - 1][posJ2y] == 'M') &&
+                                                       (gameGrid[posJ2x + 1][posJ2y] == 'O') &&
+                                                       (gameGrid[posJ2x + 1][posJ2y + 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
                                                 gameGrid[posJ2x][posJ2y] = 'O';
-                                                gameGrid[posJ2x + 1][posJ2y-1] = turn;
+                                                gameGrid[posJ2x + 1][posJ2y + 1] = turn;
                                                 gameGrid[posJ2x][posJ2y] = 'B';
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                printf("bombe 5");
+                                                posJ2x++;
+                                                posJ2y++;
+                                                moveLeft = 0;
+                                            } else if ((gameGrid[posJ2x - 1][posJ2y] == 'M') &&
+                                                       (gameGrid[posJ2x + 1][posJ2y] == 'O') &&
+                                                       (gameGrid[posJ2x + 1][posJ2y - 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                                gameGrid[posJ2x][posJ2y] = 'O';
+                                                gameGrid[posJ2x + 1][posJ2y - 1] = turn;
+                                                gameGrid[posJ2x][posJ2y] = 'B';
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
                                                 printf("bombe 6");
                                                 posJ2x++;
                                                 posJ2y--;
                                                 moveLeft = 0;
-                                            }
-                                            else {
+                                            } else {
                                                 invalidMove = 1;
                                                 break;
                                             }
@@ -1409,26 +1418,31 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 gameGrid[posJ2x + 1][posJ2y] = turn;
                                                 posJ2x++;
                                                 moveLeft--;
-                                            } else if((gameGrid[posJ2x + 1][posJ2y] == 'M') && (gameGrid[posJ2x - 1][posJ2y] == 'O') && (gameGrid[posJ2x - 1][posJ2y+1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                            } else if ((gameGrid[posJ2x + 1][posJ2y] == 'M') &&
+                                                       (gameGrid[posJ2x - 1][posJ2y] == 'O') &&
+                                                       (gameGrid[posJ2x - 1][posJ2y + 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
                                                 gameGrid[posJ2x][posJ2y] = 'O';
-                                                gameGrid[posJ2x - 1][posJ2y+1] = turn;
+                                                gameGrid[posJ2x - 1][posJ2y + 1] = turn;
                                                 gameGrid[posJ2x][posJ2y] = 'B';
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                printf("bombe 5");
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                printf("bombe 7");
                                                 posJ2x--;
                                                 posJ2y++;
                                                 moveLeft = 0;
-                                            } else if ((gameGrid[posJ2x + 1][posJ2y] == 'M') && (gameGrid[posJ2x - 1][posJ2y] == 'O') && (gameGrid[posJ2x - 1][posJ2y-1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                            } else if ((gameGrid[posJ2x + 1][posJ2y] == 'M') &&
+                                                       (gameGrid[posJ2x - 1][posJ2y] == 'O') &&
+                                                       (gameGrid[posJ2x - 1][posJ2y - 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
                                                 gameGrid[posJ2x][posJ2y] = 'O';
-                                                gameGrid[posJ2x - 1][posJ2y-1] = turn;
+                                                gameGrid[posJ2x - 1][posJ2y - 1] = turn;
                                                 gameGrid[posJ2x][posJ2y] = 'B';
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                printf("bombe 6");
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                printf("bombe 8");
                                                 posJ2x--;
                                                 posJ2y--;
                                                 moveLeft = 0;
-                                            }
-                                            else {
+                                            } else {
                                                 invalidMove = 1;
                                                 break;
                                             }
@@ -1439,26 +1453,31 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 gameGrid[posJ2x][posJ2y - 1] = turn;
                                                 posJ2y--;
                                                 moveLeft--;
-                                            } else if((gameGrid[posJ2x][posJ2y - 1] == 'M') && (gameGrid[posJ2x][posJ2y + 1] == 'O') && (gameGrid[posJ2x + 1][posJ2y+1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                            } else if ((gameGrid[posJ2x][posJ2y - 1] == 'M') &&
+                                                       (gameGrid[posJ2x][posJ2y + 1] == 'O') &&
+                                                       (gameGrid[posJ2x + 1][posJ2y + 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
                                                 gameGrid[posJ2x][posJ2y] = 'O';
-                                                gameGrid[posJ2x + 1][posJ2y+1] = turn;
+                                                gameGrid[posJ2x + 1][posJ2y + 1] = turn;
                                                 gameGrid[posJ2x][posJ2y] = 'B';
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                printf("bombe 5");
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                printf("bombe 9");
                                                 posJ2x++;
                                                 posJ2y++;
                                                 moveLeft = 0;
-                                            } else if ((gameGrid[posJ2x ][posJ2y-1] == 'M') && (gameGrid[posJ2x ][posJ2y+1] == 'O') && (gameGrid[posJ2x - 1][posJ2y+1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                            } else if ((gameGrid[posJ2x][posJ2y - 1] == 'M') &&
+                                                       (gameGrid[posJ2x][posJ2y + 1] == 'O') &&
+                                                       (gameGrid[posJ2x - 1][posJ2y + 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
                                                 gameGrid[posJ2x][posJ2y] = 'O';
-                                                gameGrid[posJ2x - 1][posJ2y+1] = turn;
+                                                gameGrid[posJ2x - 1][posJ2y + 1] = turn;
                                                 gameGrid[posJ2x][posJ2y] = 'B';
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                printf("bombe 6");
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                printf("bombe 10");
                                                 posJ2x--;
                                                 posJ2y++;
                                                 moveLeft = 0;
-                                            }
-                                            else {
+                                            } else {
                                                 invalidMove = 1;
                                                 break;
                                             }
@@ -1469,40 +1488,45 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 gameGrid[posJ2x][posJ2y + 1] = turn;
                                                 posJ2y++;
                                                 moveLeft--;
-                                            } else if((gameGrid[posJ2x][posJ2y + 1] == 'M') && (gameGrid[posJ2x][posJ2y - 1] == 'O') && (gameGrid[posJ2x + 1][posJ2y-1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                            } else if ((gameGrid[posJ2x][posJ2y + 1] == 'M') &&
+                                                       (gameGrid[posJ2x][posJ2y - 1] == 'O') &&
+                                                       (gameGrid[posJ2x + 1][posJ2y - 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
                                                 gameGrid[posJ2x][posJ2y] = 'O';
-                                                gameGrid[posJ2x + 1][posJ2y-1] = turn;
+                                                gameGrid[posJ2x + 1][posJ2y - 1] = turn;
                                                 gameGrid[posJ2x][posJ2y] = 'B';
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                printf("bombe 5");
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                printf("bombe 11");
                                                 posJ2x++;
                                                 posJ2y--;
                                                 moveLeft = 0;
-                                            } else if ((gameGrid[posJ2x ][posJ2y+1] == 'M') && (gameGrid[posJ2x ][posJ2y-1] == 'O') && (gameGrid[posJ2x - 1][posJ2y-1] == 'O')) { // Si y a un mur sur la route pose une bombe et s'en va
+                                            } else if ((gameGrid[posJ2x][posJ2y + 1] == 'M') &&
+                                                       (gameGrid[posJ2x][posJ2y - 1] == 'O') &&
+                                                       (gameGrid[posJ2x - 1][posJ2y - 1] ==
+                                                        'O')) { // Si y a un mur sur la route pose une bombe et s'en va
                                                 gameGrid[posJ2x][posJ2y] = 'O';
-                                                gameGrid[posJ2x - 1][posJ2y-1] = turn;
+                                                gameGrid[posJ2x - 1][posJ2y - 1] = turn;
                                                 gameGrid[posJ2x][posJ2y] = 'B';
-                                                insertBomb(ListeDesBombes,posJ2x, posJ2y, 4, 3);
-                                                printf("bombe 6");
+                                                insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
+                                                printf("bombe 12");
                                                 posJ2x--;
                                                 posJ2y--;
                                                 moveLeft = 0;
-                                            }
-                                            else {
+                                            } else {
                                                 invalidMove = 1;
                                                 break;
                                             }
                                         }
                                     }
-                                        //explodeBomb(listBomb, gameGrid); // fait exploser les bombes
+                                    //explodeBomb(listBomb, gameGrid); // fait exploser les bombes
 
-
-                                    }
 
                                 }
+
                             }
-                            printf("decreaseddelamort\n");
-                            //decreaseBombTimer(ListeDesBombes, gameGrid);
+                        }
+                        printf("decreaseddelamort\n");
+                        //decreaseBombTimer(ListeDesBombes, gameGrid);
 
                         //turn = 1;
                         *ptrTurn = 1;
@@ -1602,20 +1626,19 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                 if (gameGrid[i][j] == turn) {
                                     //printf("Joueur trouvé a %d %d\n", i, j);
                                     //printf("COUCOU2");
-                                    if (i==0){
-                                        if (gameGrid[map.row-1][j] == 'O'){
+                                    if (i == 0) {
+                                        if (gameGrid[map.row - 1][j] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[map.row-1][j] = turn;
+                                            gameGrid[map.row - 1][j] = turn;
                                             moveLeft--;
                                             //printf("COUCOU2vjri");
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
-                                    }
-                                    else if (gameGrid[i - 1][j] == 'O') {
+                                    } else if (gameGrid[i - 1][j] == 'O') {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i - 1][j] = turn;
 
@@ -1635,13 +1658,13 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
                                     if (j == 0) { // traverse mur
-                                        if (gameGrid[i][map.column-1] == 'O'){
+                                        if (gameGrid[i][map.column - 1] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[i][map.column-1] = turn;
+                                            gameGrid[i][map.column - 1] = turn;
                                             moveLeft--;
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
@@ -1664,19 +1687,18 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
 
                                 if (gameGrid[i][j] == turn) {
                                     //printf("Joueur trouvé a %d %d\n", i, j);
-                                    if (i==map.row-1){
-                                        if (gameGrid[map.row-map.row][j] == 'O'){
+                                    if (i == map.row - 1) {
+                                        if (gameGrid[map.row - map.row][j] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[map.row-map.row][j] = turn;
+                                            gameGrid[map.row - map.row][j] = turn;
                                             moveLeft--;
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
-                                    }
-                                    else if (gameGrid[i + 1][j] == 'O') {
+                                    } else if (gameGrid[i + 1][j] == 'O') {
                                         gameGrid[i][j] = 'O';
                                         gameGrid[i + 1][j] = turn;
                                         printf("DESCENDU");
@@ -1700,14 +1722,14 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                             for (int j = 0; j < map.column; j++) {
                                 if (gameGrid[i][j] == turn) {
                                     printf("Joueur trouvé a %d %d\n", i, j);
-                                    if (j == map.column-1) { // traverse le mur
-                                        if (gameGrid[i][map.column-map.column] == 'O'){
+                                    if (j == map.column - 1) { // traverse le mur
+                                        if (gameGrid[i][map.column - map.column] == 'O') {
                                             gameGrid[i][j] = 'O';
-                                            gameGrid[i][map.column-map.column] = turn;
+                                            gameGrid[i][map.column - map.column] = turn;
                                             moveLeft--;
                                             //counter = 1;
                                             break;
-                                        }else {
+                                        } else {
                                             invalidMove = 1;
                                             break;
                                         }
@@ -1741,7 +1763,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i - 1][j] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
                                                     gameGrid[i - 1][j] = turn;
 
                                                     moveLeft--;
@@ -1761,7 +1783,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i][j - 1] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
                                                     gameGrid[i][j - 1] = turn;
                                                     moveLeft--;
                                                     break;
@@ -1781,7 +1803,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i + 1][j] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
                                                     gameGrid[i + 1][j] = turn;
                                                     moveLeft--;
                                                     break;
@@ -1800,7 +1822,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
                                                 if (gameGrid[i][j + 1] == 'O') {
                                                     gameGrid[i][j] = 'B';
                                                     //listBomb = addBomb(listBomb, i, j, 2, 3);
-                                                    insertBomb(ListeDesBombes,i, j, 4, 3);
+                                                    insertBomb(ListeDesBombes, i, j, 4, 3);
 
                                                     gameGrid[i][j + 1] = turn;
                                                     moveLeft--;
@@ -1863,7 +1885,7 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
 
 
             }
-                //explodeBomb(listBomb, gameGrid);
+            //explodeBomb(listBomb, gameGrid);
 
 //        for(int i = 0; i < map.row; i++){
 //            for(int j = 0; j < map.column; j++){
@@ -1879,9 +1901,9 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int vsChoice) {
     }
 }
 
-Liste* init(){
-    Liste* liste = malloc(sizeof(*liste));
-    if(liste == NULL){
+Liste *init() {
+    Liste *liste = malloc(sizeof(*liste));
+    if (liste == NULL) {
         exit(EXIT_FAILURE);
     }
     liste->premier = NULL;
@@ -1889,9 +1911,9 @@ Liste* init(){
     return liste;
 }
 
-void insertBomb(Liste* liste, int x, int y, int timer, int range){
-    Bomb* nouveau = malloc(sizeof(*nouveau));
-    if(liste == NULL || nouveau == NULL){
+void insertBomb(Liste *liste, int x, int y, int timer, int range) {
+    Bomb *nouveau = malloc(sizeof(*nouveau));
+    if (liste == NULL || nouveau == NULL) {
         exit(EXIT_FAILURE);
     }
     nouveau->x = x;
@@ -1902,13 +1924,13 @@ void insertBomb(Liste* liste, int x, int y, int timer, int range){
     liste->premier = nouveau;
 }
 
-void decreaseBombTimer(Liste* liste, char** gameGrid){
-    Bomb* bomb = liste->premier;
+void decreaseBombTimer(Liste *liste, char **gameGrid) {
+    Bomb *bomb = liste->premier;
     printf("cassis\n");
-    while(bomb != NULL){
+    while (bomb != NULL) {
         int condition = --(bomb->timer);
         printf("%d\n", condition);
-        if(condition == 0){
+        if (condition == 0) {
             printf("3\n");
             explodeBomb(liste, gameGrid);
         }
@@ -1917,11 +1939,11 @@ void decreaseBombTimer(Liste* liste, char** gameGrid){
     printf("4\n");
 }
 
-void explodeBomb(Liste* liste, char** gameGrid){
-    if(liste == NULL){
+void explodeBomb(Liste *liste, char **gameGrid) {
+    if (liste == NULL) {
         exit(EXIT_FAILURE);
     }
-    Bomb* actual = liste->premier;
+    Bomb *actual = liste->premier;
 //    while(actual != NULL){
 //        if(actual->timer == 0){
 //            actual->timer = -1;
@@ -1998,62 +2020,58 @@ void explodeBomb(Liste* liste, char** gameGrid){
 //        actual = actual->suivant;
 //    }
 
-    while(actual != NULL){
-        if(actual->timer == 0){
+    while (actual != NULL) {
+        if (actual->timer == 0) {
             gameGrid[actual->x][actual->y] = 'O';
             //check left
             actual->timer = -1;
-            for(int i = 1; i <= actual->range-1; i++){
-                if(gameGrid[actual->x][actual->y - i] == 'X'){
+            for (int i = 1; i <= actual->range - 1; i++) {
+                if (gameGrid[actual->x][actual->y - i] == 'X') {
                     break;
-                }
-                else if(gameGrid[actual->x][actual->y - i] == 'M'){
+                } else if (gameGrid[actual->x][actual->y - i] == 'M') {
                     gameGrid[actual->x][actual->y - i] = 'O';
                     break;
-                }
-                else if(gameGrid[actual->x][actual->y - i] == '1' || gameGrid[actual->x][actual->y - i] == '2' || gameGrid[actual->x][actual->y - i] == '3' || gameGrid[actual->x][actual->y - i] == '4'){
+                } else if (gameGrid[actual->x][actual->y - i] == '1' || gameGrid[actual->x][actual->y - i] == '2' ||
+                           gameGrid[actual->x][actual->y - i] == '3' || gameGrid[actual->x][actual->y - i] == '4') {
                     gameGrid[actual->x][actual->y - i] = 'O';
                     break;
                 }
             }
             //check right
-            for(int i = 1; i <= actual->range-1; i++){
-                if(gameGrid[actual->x][actual->y + i] == 'X'){
+            for (int i = 1; i <= actual->range - 1; i++) {
+                if (gameGrid[actual->x][actual->y + i] == 'X') {
                     break;
-                }
-                else if(gameGrid[actual->x][actual->y + i] == 'M'){
+                } else if (gameGrid[actual->x][actual->y + i] == 'M') {
                     gameGrid[actual->x][actual->y + i] = 'O';
                     break;
-                }
-                else if(gameGrid[actual->x][actual->y + i] == '1' || gameGrid[actual->x][actual->y + i] == '2' || gameGrid[actual->x][actual->y + i] == '3' || gameGrid[actual->x][actual->y + i] == '4'){
+                } else if (gameGrid[actual->x][actual->y + i] == '1' || gameGrid[actual->x][actual->y + i] == '2' ||
+                           gameGrid[actual->x][actual->y + i] == '3' || gameGrid[actual->x][actual->y + i] == '4') {
                     gameGrid[actual->x][actual->y + i] = 'O';
                     break;
                 }
             }
             //check up
-            for(int i = 1; i <= actual->range-1; i++){
-                if(gameGrid[actual->x - i][actual->y] == 'X'){
+            for (int i = 1; i <= actual->range - 1; i++) {
+                if (gameGrid[actual->x - i][actual->y] == 'X') {
                     break;
-                }
-                else if(gameGrid[actual->x - i][actual->y] == 'M'){
+                } else if (gameGrid[actual->x - i][actual->y] == 'M') {
                     gameGrid[actual->x - i][actual->y] = 'O';
                     break;
-                }
-                else if(gameGrid[actual->x - i][actual->y] == '1' || gameGrid[actual->x - i][actual->y] == '2' || gameGrid[actual->x - i][actual->y] == '3' || gameGrid[actual->x - i][actual->y] == '4'){
+                } else if (gameGrid[actual->x - i][actual->y] == '1' || gameGrid[actual->x - i][actual->y] == '2' ||
+                           gameGrid[actual->x - i][actual->y] == '3' || gameGrid[actual->x - i][actual->y] == '4') {
                     gameGrid[actual->x - i][actual->y] = 'O';
                     break;
                 }
             }
             //check down
-            for(int i = 1; i <= actual->range-1; i++){
-                if(gameGrid[actual->x + i][actual->y] == 'X'){
+            for (int i = 1; i <= actual->range - 1; i++) {
+                if (gameGrid[actual->x + i][actual->y] == 'X') {
                     break;
-                }
-                else if(gameGrid[actual->x + i][actual->y] == 'M'){
+                } else if (gameGrid[actual->x + i][actual->y] == 'M') {
                     gameGrid[actual->x + i][actual->y] = 'O';
                     break;
-                }
-                else if(gameGrid[actual->x + i][actual->y] == '1' || gameGrid[actual->x + i][actual->y] == '2' || gameGrid[actual->x + i][actual->y] == '3' || gameGrid[actual->x + i][actual->y] == '4'){
+                } else if (gameGrid[actual->x + i][actual->y] == '1' || gameGrid[actual->x + i][actual->y] == '2' ||
+                           gameGrid[actual->x + i][actual->y] == '3' || gameGrid[actual->x + i][actual->y] == '4') {
                     gameGrid[actual->x + i][actual->y] = 'O';
                     break;
                 }
@@ -2068,14 +2086,12 @@ void explodeBomb(Liste* liste, char** gameGrid){
     }
 }
 
-void deleteBomb(Liste *liste){
-    if (liste == NULL)
-    {
+void deleteBomb(Liste *liste) {
+    if (liste == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    while(liste->premier != NULL)
-    {
+    while (liste->premier != NULL) {
         Bomb *aSupprimer = liste->premier;
         liste->premier = liste->premier->suivant;
         free(aSupprimer);
