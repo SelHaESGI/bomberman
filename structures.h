@@ -57,7 +57,7 @@ Map map_6 = {
         .players = 4,
 };
 
-Map rand_map(int column, int row){
+Map rand_map(int row, int column){
     if(column < 12 ||  row < 12 ){
         Map map = {
                 .bomb = 2,

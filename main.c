@@ -129,28 +129,26 @@ void startMenu() {
 }
 
 void randomMap() {
-    int l;
-    int L;
+    int rows,columns;
 
-    const char randomCharacters[]="MO";
+    const char randomCharacters[]="MOOO";
     int randSize=sizeof(randomCharacters)-1;
     srand(time(0));
 
     printf("Entrer taille tableau l et L\n");
-    printf("Longeur : \n");
-    scanf("%d", &l);
-    printf("Largeur : \n");
-    scanf("%d", &L);
+    printf("nombre de Lignes  : \n");
+    scanf("%d", &rows);
+    printf("nombre de Colonnes : \n");
+    scanf("%d", &columns);
     clearTerminal();
 
-    int Map[l][L];
+    int Map[rows][columns];
 
-    for (int i =0; i < l; i++) {
-        for (int j = 0; j < L; j++) {
+    for (int i =0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
             //murs tout autour ( cadre ) : position 0 et l-1
-            if ((i == 0) || (j == 0) || (i == l-1) || (j == L-1)) Map[i][j] = 'X';
+            if ((i == 0) || (j == 0) || (i == rows-1) || (j == columns-1)) Map[i][j] = 'X';
                 //position du joueur à l'indice (1,1)
-            else if ((i == 1) && (j == 1)) Map[i][j] = '1';
             else if (i==1 && j==1) Map[i][j] = '1';
             else Map[i][j] = randomCharacters[rand()%randSize];
 
@@ -171,8 +169,8 @@ void randomMap() {
         exit(EXIT_FAILURE);
     }
 
-    for (int i =0; i < l; i++) {
-        for (int j = 0; j < L; j++) {
+    for (int i =0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
             fprintf(fPtr,"%c", Map[i][j]);
         }
         fprintf(fPtr,"\n");
@@ -185,22 +183,26 @@ void randomMap() {
     int turn = 1;
     int *ptrTurn = &turn;
 
+    struct Map random_map = rand_map(rows,columns);
 
+    char line;
 
-    struct Map random_map = rand_map(L,l);
-
-
-    // launchGame(rand_map(L,l).grid, rand_map(L,l), ptrTurn, 1);
-
-    for (int i = 0; i < random_map.row; i++) {
+    random_map.grid = malloc(random_map.row * sizeof(char *));
+    for (int i = 0; i < random_map.row; i++)
+        random_map.grid[i] = malloc(random_map.column * sizeof(char));
+    //INITIALISATION DE LA MAP 1
+    for (int i = 0; i < random_map.row; i++)
         for (int j = 0; j < random_map.column; j++) {
-            printMap(random_map.grid[i][j]);
-            if (j == random_map.column - 1) {
-                printf("\n");
+            line = fgetc(fPtr);
+            if (line == EOF) break;
+            if (line != '\n') {
+                random_map.grid[i][j] = line;
+            } else {
+                j--;
             }
         }
-    }
 
+    launchGame(random_map.grid, random_map, ptrTurn, 1);
 
 }
 
