@@ -26,6 +26,5 @@ void purple() {printf("\033[1;35m");}
 void reset() {printf("\033[0m");}
 
 
-
 void err_n_die(const char *fmt, ...);
 char *bin2hex(const unsigned char *input, size_t len);

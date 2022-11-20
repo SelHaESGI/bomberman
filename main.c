@@ -1,5 +1,5 @@
 #include "common.h"
-
+#include<time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -177,7 +177,7 @@ void startMenu() {
     printf("4. Quitter\n");
     reset();
     blue();
-    printf("5. Map random (marche pas encore)\n");
+    printf("5. Map random\n");
     reset();
 
     int choice;
@@ -215,27 +215,61 @@ void startMenu() {
 void randomMap() {
     int l;
     int L;
+
+    const char randomCharacters[]="MO";
+    int randSize=sizeof(randomCharacters)-1;
+    srand(time(0));
+
     printf("Entrer taille tableau l et L\n");
     printf("Longeur : \n");
     scanf("%d", &l);
     printf("Largeur : \n");
     scanf("%d", &L);
     clearTerminal();
-    int Tab[l][L];
+
+    int Map[l][L];
+
     for (int i =0; i < l; i++) {
         for (int j = 0; j < L; j++) {
-            if ((i == 0) || (j == 0)) {
-                Tab[i][j] == 'X';
-            } else if ((i == l) || (j == L)) {
-                Tab[i][j] = 'X';
-            }
-            else {
-                Tab[i][j] == 'O';
-            }
-            printf("%c",Tab[i][j]);
+            //murs tout autour : position 0 et l-1
+            if ((i == 0) || (j == 0) || (i == l-1) || (j == L-1)) Map[i][j] = 'X';
+                //position du joueur 1
+            else if ((i == 1) && (j == 1)) Map[i][j] = '1';
+            else if (i==1 && j==1) Map[i][j] = '1';
+            else Map[i][j] = randomCharacters[rand()%randSize];
+
         }
+
+
     }
+
+
+    FILE * fPtr;
+    char fName[20] = "randomMap.txt";
+    fPtr = fopen(fName, "w");
+
+    /* fopen() return NULL if last operation was unsuccessful */
+    if(fPtr == NULL)
+    {
+        /* File not created hence exit */
+        printf("Unable to create file.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i =0; i < l; i++) {
+        for (int j = 0; j < L; j++) {
+            fprintf(fPtr,"%c", Map[i][j]);
+        }
+        fprintf(fPtr,"\n");
+    }
+    printf("Map created and saved successfully. :) \n");
+    fclose(fPtr);
+
+
+    // launchGame(map_3.grid, map_3, ptrTurn, vsChoice);
+
 }
+
 
 void multijoueur() {
     blue();

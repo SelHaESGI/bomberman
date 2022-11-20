@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(){
+int main(void){
     int listenfd, connfd,n;
     struct sockaddr_in serv_addr;
     uint8_t sendBuff[MAX_LINE];
