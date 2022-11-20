@@ -5,99 +5,8 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "struct.h"
 #define MAX_LEN 256
-
-typedef struct {
-    int bomb;
-    int column;
-    int row;
-    int players;
-    int move;
-    char **grid;
-} Map;
-
-Map map_1 = {
-        .bomb = 100,
-        .column = 8,
-        .row = 8,
-        .players = 2,
-        .move = 6,
-};
-
-Map map_2 = {
-        .bomb = 2,
-        .column = 10,
-        .row = 10,
-        .players = 3,
-        .move = 5,
-};
-
-Map map_3 = {
-        .bomb = 2,
-        .column = 12,
-        .row = 12,
-        .players = 2,
-        .move = 6,
-};
-
-Map map_4 = {
-        .bomb = 3,
-        .column = 16,
-        .row = 16,
-        .players = 4,
-        .move = 6,
-};
-
-Map map_5 = {
-        .bomb = 2,
-        .column = 14,
-        .row = 14,
-        .players = 4,
-        .move = 6,
-
-};
-Map map_6 = {
-        .bomb = 3,
-        .column = 16,
-        .row = 16,
-        .players = 4,
-        .move = 6,
-};
-
-typedef struct Bomb Bomb;
-struct Bomb {
-    int x;
-    int y;
-    int timer;
-    int range;
-    int owner;
-    struct Bomb *suivant;
-};
-
-typedef struct Liste Liste;
-struct Liste {
-    Bomb *premier;
-};
-
-typedef struct Player Player;
-struct Player {
-    int x;
-    int y;
-    int id;
-    int isAlive;
-    int isBot;
-    int bomb;
-    int flameRange;
-    int life;
-    int heart;
-    int invincible;
-    struct Player *suivant;
-};
-
-typedef struct ListePlayer ListePlayer;
-struct ListePlayer {
-    Player *premier;
-};
 
 Liste* init();
 void insertBomb(Liste* liste, int x, int y, int timer, int range, int owner);
@@ -112,7 +21,7 @@ void insertPlayer(ListePlayer* liste, int x, int y, int id, int isAlive, int isB
 void deletePlayer(ListePlayer *liste);
 void modifyPlayer(ListePlayer *liste, int id, int x, int y, int isAlive, int bomb, int flameRange, int life, int heart, int invincible);
 
-void checkIfWin(Map map, char** gameGrid);
+void checkIfWin(Map map, char** gameGrid, Liste *ListeDesBombes, ListePlayer* ListeDesJoueurs);
 void checkIfPlayerCanPlay(Map map, char** gameGrid, int* ptrTurn);
 int checkIfPlayerCanMove(char** gameGrid, Map map, char direction, char turn, int isBomb, Liste* ListeDesBombes, ListePlayer* ListeDesJoueurs);
 void checkIfPlayerCanRevive(ListePlayer* ListeDesJoueurs, char** gameGrid, Map map);
@@ -210,7 +119,7 @@ void showLogo() {
     FILE *fptr = NULL;
 
     if ((fptr = fopen(filename, "r")) == NULL) {
-        fprintf(stderr, "error opening %s\n", filename);
+        fprintf(stderr, "Erreur d'ouverture du fichier %s\n", filename);
         return;
     }
 
@@ -233,16 +142,9 @@ void startMenu() {
     green();
     printf("1. Jouer\n");
     reset();
-    printf("\u25A0 \u25A0 \u25A0 \u25A0 \u25A0\n");
-    printf("\u25A0 \u24e7 \u25A5 \u2297 \u25A0\n");
-    printf("\u25A0 \u24e7 \u25A5  2\u25A0\n");
-    printf("\u25A0 \u25A0 \u25A0 \u25A0 \u25A0\n");
-    printf("coeur : \u2661 \u2665 \n");
-
-    yellow();
-    printf("2. Options\n");
+//    printf("coeur : \u2661 \u2665 \n");
     red();
-    printf("3. Quitter\n");
+    printf("2. Quitter\n");
     reset();
 
     int choice;
@@ -253,9 +155,6 @@ void startMenu() {
             chooseMap();
             break;
         case 2:
-            setOptions();
-            break;
-        case 3:
             quitGame();
             break;
         default:
@@ -266,13 +165,10 @@ void startMenu() {
             reset();
             startMenu();
             break;
-
     }
-
 }
 
 void chooseMap() {
-
 
     printAllMaps();
     int turn = 1;
@@ -293,15 +189,12 @@ void chooseMap() {
             FILE *fptr = NULL;
 
             if ((fptr = fopen(filename, "r")) == NULL) {
-                fprintf(stderr, "error opening %s\n", filename);
+                fprintf(stderr, "Erreur d'ouverture du fichier %s\n", filename);
                 exit(-1);
             }
-            //MAP 1
-            //ASSIGNATION DE LA MAP 1
             map_1.grid = malloc(map_1.row * sizeof(char *));
             for (int i = 0; i < map_1.row; i++)
                 map_1.grid[i] = malloc(map_1.column * sizeof(char));
-            //INITIALISATION DE LA MAP 1
             for (int i = 0; i < map_1.row; i++)
                 for (int j = 0; j < map_1.column; j++) {
                     line = fgetc(fptr);
@@ -327,12 +220,9 @@ void chooseMap() {
                 fprintf(stderr, "error opening %s\n", filename);
                 exit(-1);
             }
-            //MAP 2
-            //ASSIGNATION DE LA MAP 2
             map_2.grid = malloc(map_2.row * sizeof(char *));
             for (int i = 0; i < map_2.row; i++)
                 map_2.grid[i] = malloc(map_2.column * sizeof(char));
-            //INITIALISATION DE LA MAP 2
             for (int i = 0; i < map_2.row; i++)
                 for (int j = 0; j < map_2.column; j++) {
                     line = fgetc(fptr);
@@ -357,12 +247,9 @@ void chooseMap() {
                 fprintf(stderr, "error opening %s\n", filename);
                 exit(-1);
             }
-            //MAP 3
-            //ASSIGNATION DE LA MAP 3
             map_3.grid = malloc(map_3.row * sizeof(char *));
             for (int i = 0; i < map_3.row; i++)
                 map_3.grid[i] = malloc(map_3.column * sizeof(char));
-            //INITIALISATION DE LA MAP 3
             for (int i = 0; i < map_3.row; i++)
                 for (int j = 0; j < map_3.column; j++) {
                     line = fgetc(fptr);
@@ -379,70 +266,6 @@ void chooseMap() {
                 free(map_3.grid[i]);
             free(map_3.grid);
             break;
-            // TODO: Adrien début
-        /**case 4:
-            filename = "mapTest.txt";
-            fptr = NULL;
-
-            if ((fptr = fopen(filename, "r")) == NULL) {
-                fprintf(stderr, "error opening %s\n", filename);
-                exit(-1);
-            }
-            //MAP Test
-            //ASSIGNATION DE LA MAP Test
-            map_Test.grid = malloc(map_Test.row * sizeof(char *));
-            for (int i = 0; i < map_Test.row; i++)
-                map_Test.grid[i] = malloc(map_Test.column * sizeof(char));
-            //INITIALISATION DE LA MAP Test
-            for (int i = 0; i < map_Test.row; i++)
-                for (int j = 0; j < map_Test.column; j++) {
-                    line = fgetc(fptr);
-                    if (line == EOF) break;
-                    if (line != '\n') {
-                        map_Test.grid[i][j] = line;
-                    } else {
-                        j--;
-                    }
-                }
-            fclose(fptr);
-            launchGame(map_4.grid, map_4, ptrTurn);
-            for (int i = 0; i < map_Test.row; i++)
-                free(map_Test.grid[i]);
-
-            free(map_Test.grid);
-            break;
-        case 5:
-            filename = "mapRandom.txt";
-            fptr = NULL;
-
-            if ((fptr = fopen(filename, "r")) == NULL) {
-                fprintf(stderr, "error opening %s\n", filename);
-                exit(-1);
-            }
-            //MAP 1
-            //ASSIGNATION DE LA MAP 1
-            map_Random.grid = malloc(map_Random.row * sizeof(char *));
-            for (int i = 0; i < map_Random.row; i++)
-                map_Random.grid[i] = malloc(map_Random.column * sizeof(char));
-            //INITIALISATION DE LA MAP 1
-            for (int i = 0; i < map_Random.row; i++)
-                for (int j = 0; j < map_Random.column; j++) {
-                    line = fgetc(fptr);
-                    if (line == EOF) break;
-                    if (line != '\n') {
-                        map_Random.grid[i][j] = line;
-                    } else {
-                        j--;
-                    }
-                }
-            fclose(fptr);
-                    //launchGame(map_Random.grid, map_Random, ptrTurn);
-                    for (int i = 0; i < map_Test.row; i++)
-                        free(map_Test.grid[i]);
-
-                    free(map_Test.grid);
-                    break;**/
-                    // TODO: Fin Adrien
 //        case 4:
 //            //MAP 4
 //            //ASSIGNATION DE LA MAP 4
@@ -539,9 +362,8 @@ void printAllMaps() {
     printf("■   ▥   ▥     ■\n");
     printf("■     ▥     웃■\n");
     printf("■ ■ ■ ■ ■ ■ ■ ■\n");
-    red();
+    yellow();
     printf("\nAttribut :\n");
-    reset();
     printf("Nombre de bombes par défaut : %d\n", map_1.bomb);
     printf("Taille de la grille : %dx%d\n", map_1.row, map_1.column);
     printf("Nombre de joueurs maximal : %d\n\n", map_1.players);
@@ -559,9 +381,8 @@ void printAllMaps() {
     printf("■ ▥             ▥ ■\n");
     printf("■        웃       ■\n");
     printf("■ ■ ■ ■ ■ ■ ■ ■ ■ ■\n");
-    blue();
+    yellow();
     printf("\nAttribut :\n");
-    reset();
     printf("Nombre de bombes par défaut : %d\n", map_2.bomb);
     printf("Taille de la grille : %dx%d\n", map_2.row, map_2.column);
     printf("Nombre de joueurs maximal : %d\n\n", map_2.players);
@@ -581,13 +402,12 @@ void printAllMaps() {
     printf("■   ▥   ▥   ▥   ▥     ■\n");
     printf("■ ▥   ▥   ▥   ▥     웃■\n");
     printf("■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■\n");
-    blue();
+    yellow();
     printf("\nAttribut :\n");
-    reset();
     printf("Nombre de bombes par défaut : %d\n", map_3.bomb);
     printf("Taille de la grille : %dx%d\n", map_3.row, map_3.column);
     printf("Nombre de joueurs maximal : %d\n\n", map_3.players);
-
+    reset();
 
 }
 
@@ -646,28 +466,25 @@ void launchGame(char **grid, Map map, int *ptrTurn) {
         }
     }
     printf("\n");
+    yellow();
     printf("Nombre de bombes par défaut : %d\n", map.bomb);
     printf("Commandes :\n");
     printf("1. Déplacer le joueur : Z = haut, S = bas, Q = gauche, D = droite\n");
     printf("2. Poser une bombe : B\n");
     printf("3. Abandonner : A\n");
-    printf("4. Finir le tour avant les 5 mouvements : P\n");
+    printf("4. Finir le tour avant la fin des mouvements : P\n\n");
+    blue();
     printf("Voulez vous jouer en Joueur VS Joueur, ou Joueur vs Bot?\n");
     printf("1. Joueur VS Joueur\n");
     printf("2. Joueur VS Bot\n");
+    reset();
     int botChoice;
     scanf("%d", &botChoice);
     clearStdin();
     clearTerminal();
     changeGrid(grid, map, ptrTurn, botChoice);
-
     clearStdin();
     clearTerminal();
-    //launchGame(grid, map, ptrTurn);
-
-//    for (int i = 0; i < map.row; i++)
-//        free(map.grid[i]);
-//    free(map.grid);
 }
 
 
@@ -676,42 +493,21 @@ void setOptions() {}
 
 void quitGame() {
     printf("Merci d'avoir joué !\n");
-    //deleteBomb(Bomb *bomb);
     exit(0);
 }
 
 void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
-    //Bomb* listBomb = NULL;
     Liste *ListeDesBombes = init();
     ListePlayer* ListeDesJoueurs = initPlayer();
-
-    //create struct element for each Map map.players
-   /* for (int a = 0; a < map.players; a++) {
-        int playerInt = a + 1;
-        //convert int to char
-        char playerChar = playerInt + '0';
-        for (int i = 0; i < map.row; i++) {
-            for (int j = 0; j < map.column; j++) {
-                if(gameGrid[i][j] == playerChar) {
-                    if(gameGrid[i][j] == '1') {
-                        insertPlayer(ListeDesJoueurs, i, j, 1, 1, 0, map.bomb, 0, 0, 0, 0);
-                    }else{
-                        insertPlayer(ListeDesJoueurs, i, j, playerInt, 1, 1, map.bomb, 0, 0, 0, 0);
-                    }
-                }
-            }
-        }
-    }*/
 
     for(int x = 0; x < map.players; x++){
         int playerInt = x + 1;
         int isBot = 0;
-        //convert int to char
         char playerChar = playerInt + '0';
         for (int i = 0; i < map.row; i++) {
             for (int j = 0; j < map.column; j++) {
                 if(gameGrid[i][j] == playerChar) {
-                    printf("Player %d is at %d, %d\n", playerInt, i, j);
+                    printf("Le joueur %d a été placé %d, %d\n", playerInt, i, j);
                     if(playerInt==1 && botChoice==2){
                         isBot = 0;
                     }else if (botChoice==1){
@@ -737,16 +533,20 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
     char turn;
     int botValidation = 0;
     while (moveLeft > 0) {
+        yellow();
         printf("Tour du joueur %d\n", *ptrTurn);
-        //clearStdin();
-
-        //clearTerminal();
+        reset();
         checkIfPlayerCanPlay(map, gameGrid, ptrTurn);
-        //Conversion int* vers char via la ta
-        char turn = *ptrTurn + '0';
-        int playerBomb = getBombPlayer(ListeDesJoueurs, *ptrTurn);
+        turn = *ptrTurn + '0';
+        playerBomb = getBombPlayer(ListeDesJoueurs, *ptrTurn);
         int isBot = getIsBotPlayer(ListeDesJoueurs, *ptrTurn);
-        printf("Le joueur %c à %d bomb restante\n", turn, playerBomb);
+        red();
+        if(playerBomb == 1){
+            printf("Le joueur %c à %d bombe restante\n", turn, playerBomb);
+        } else{
+            printf("Le joueur %c à %d bombes restantes\n", turn, playerBomb);
+        }
+        reset();
         for (int i = 0; i < map.row; i++) {
             for (int j = 0; j < map.column; j++) {
                 printMap(gameGrid[i][j]);
@@ -755,7 +555,17 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
                 }
             }
         }
-        printf("Vous avez %d mouvements restants\n", moveLeft);
+        if(moveLeft>2){
+            green();
+        }else{
+            red();
+        }
+        if(moveLeft==1){
+            printf("Vous avez %d mouvement restant\n", moveLeft);
+        }else{
+            printf("Vous avez %d mouvements restants\n", moveLeft);
+        }
+        reset();
 //        if (invalidMove == 1) {
 //            red();
 //            printf("Vous ne pouvez pas vous déplacer ici\n");
@@ -765,10 +575,8 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
         printf("Joueur %d, choisissez vos actions : ", *ptrTurn);
         //TODO: EMPECHER LE BOT DE SCANF
         if( isBot == 0 ){
-            //choosedAction = getchar();
             scanf(" %c", &choosedAction);
         }else{
-            //void botAction(char **gameGrid, Map map, Liste *ListeDesBombes, ListePlayer* ListeDesJoueurs)
             botValidation = botAction(gameGrid, map, turn, ListeDesBombes, ListeDesJoueurs, moveLeft);
             if(botValidation == 1){
                 moveLeft = 0;
@@ -776,7 +584,6 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
             }
 
         }
-        //scanf(" %c", &choosedAction);
         if(moveLeft != 0){
             switch (toupper(choosedAction)) {
                 case 'A':
@@ -791,28 +598,6 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
                     moveLeft = map.move;
                     break;
                 case 'Z':
-    //                for (int i = 0; i < map.row; i++) {
-    //                    for (int j = 0; j < map.column; j++) {
-    //                        if (gameGrid[i][j] == turn) {
-    //                            if (gameGrid[i - 1][j] == 'S'){
-    //                                gameGrid[i][j] = 'O';
-    //                                gameGrid[i - 1][j] = turn;
-    //                                moveLeft--;
-    //                                getBonus(ListeDesJoueurs, ptrTurn);
-    //                                break;
-    //                            }else if (gameGrid[i - 1][j] == 'O') {
-    //                                gameGrid[i][j] = 'O';
-    //                                gameGrid[i - 1][j] = turn;
-    //
-    //                                moveLeft--;
-    //                                break;
-    //                            } else {
-    //                                invalidMove = 1;
-    //                                break;
-    //                            }
-    //                        }
-    //                    }
-    //                }
                     verifyMove = checkIfPlayerCanMove(gameGrid, map, toupper(choosedAction), turn, 0, ListeDesBombes, ListeDesJoueurs);
                     if(verifyMove == 1) {
                         moveLeft--;
@@ -851,24 +636,6 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
                         scanf(" %c", &bombMove);
                         switch (toupper(bombMove)) {
                             case 'Z':
-    //                            for (int i = 0; i < map.row; i++) {
-    //                                for (int j = 0; j < map.column; j++) {
-    //                                    if (gameGrid[i][j] == turn) {
-    //                                        if (gameGrid[i - 1][j] == 'O') {
-    //                                            gameGrid[i][j] = 'B';
-    //                                            //listBomb = addBomb(listBomb, i, j, 2, 3);
-    //                                            insertBomb(ListeDesBombes,i, j, 4, 3);
-    //                                            gameGrid[i - 1][j] = turn;
-    //
-    //                                            moveLeft--;
-    //                                            break;
-    //                                        } else {
-    //                                            invalidMove = 1;
-    //                                            break;
-    //                                        }
-    //                                    }
-    //                                }
-    //                            }
                                 verifyMove = checkIfPlayerCanMove(gameGrid, map, toupper(bombMove), turn, 1, ListeDesBombes, ListeDesJoueurs);
                                 if(verifyMove == 1) {
                                     moveLeft--;
@@ -928,10 +695,9 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
         verifyMove = 0;
         isBomb = 0;
         if (invalidMove ==0) {
-            printf("invalidMove = 0\n");
             decreaseBombTimer(ListeDesBombes, gameGrid, ListeDesJoueurs);
             checkIfPlayerCanRevive(ListeDesJoueurs, gameGrid, map);
-            checkIfWin(map, gameGrid);
+            checkIfWin(map, gameGrid, ListeDesBombes, ListeDesJoueurs);
         }else{
             red();
             printf("Vous ne pouvez pas vous déplacer ici\n");
@@ -943,14 +709,11 @@ void changeGrid(char **gameGrid, Map map, int *ptrTurn, int botChoice) {
             invalidChar = 0;
         }
         if (moveLeft == 0) {
-            printf("moveLeft = 0\n");
             *ptrTurn = *ptrTurn + 1;
             if (*ptrTurn > map.players) {
                 *ptrTurn = 1;
             }
-            printf("ptrTurn = %d\n", *ptrTurn);
             moveLeft = map.move;
-            printf("moveLeft = %d\n", moveLeft);
         }
         fflush(stdin);
     }
@@ -1033,32 +796,22 @@ void modifyPlayer(ListePlayer* liste, int id, int x, int y, int isAlive, int bom
     Player* player = liste->premier;
     while(player != NULL){
         if(player->id == id){
-            printf("Modification du joueur %d\n", id);
             if(x != -1){
                 player->x = x;
-                printf("x : %d -> %d\n", player->x, x);
             }
             if(y != -1){
                 player->y = y;
-                printf("y : %d -> %d\n", player->y, x);
             }
             if(isAlive != -1){
-                printf("isAlive : %d -> %d\n", player->isAlive, isAlive);
                 player->isAlive = isAlive;
             }
             player->bomb = player->bomb + bomb;
-            printf("bomb : %d -> %d\n", player->bomb - bomb, player->bomb);
             player->flameRange = player->flameRange + flameRange;
-            printf("flameRange : %d -> %d\n", player->flameRange - flameRange, player->flameRange);
             player->life = player->life + life;
-            printf("life : %d -> %d\n", player->life - life, player->life);
             if(player->heart != -1 && player->heart != 1){
-                printf("heart : %d -> %d\n", player->heart, heart);
                 player->heart = heart;
             }
-            printf("heart DDD %d\n", player->heart);
             player->invincible = invincible;
-            printf("invincible : %d -> %d\n", player->invincible, invincible);
         }
         player = player->suivant;
     }
@@ -1078,7 +831,6 @@ void explodeBomb(Liste* liste, char** gameGrid, ListePlayer* ListeDesJoueurs){
             owner = actual->owner;
             gameGrid[actual->x][actual->y] = 'O';
             modifyPlayer(ListeDesJoueurs, owner, -1, -1, -1, 1, 0, 0, 0, 0);
-            //check left
             actual->timer = -1;
             for(int i = 1; i <= actual->range-1; i++){
                 if(gameGrid[actual->x][actual->y - i] == 'X'){
@@ -1086,7 +838,6 @@ void explodeBomb(Liste* liste, char** gameGrid, ListePlayer* ListeDesJoueurs){
                 }
                 else if(gameGrid[actual->x][actual->y - i] == 'M'){
                     randomBonus = rand() % 100;
-                    printf("randomBonus : %d\n", randomBonus);
                     if(randomBonus > tauxDropBonus){
                         gameGrid[actual->x][actual->y - i] = 'S';
                     }else{
@@ -1096,7 +847,6 @@ void explodeBomb(Liste* liste, char** gameGrid, ListePlayer* ListeDesJoueurs){
                 }
                 else if(gameGrid[actual->x][actual->y - i] == '1' || gameGrid[actual->x][actual->y - i] == '2' || gameGrid[actual->x][actual->y - i] == '3' || gameGrid[actual->x][actual->y - i] == '4'){
                     int deadPlayer = gameGrid[actual->x][actual->y - i] - '0';
-                    printf("Le joueur %d est mort\n", deadPlayer);
                     modifyPlayer(ListeDesJoueurs, deadPlayer, -1, -1, 0, 0, 0, 0, 0, 0);
                     gameGrid[actual->x][actual->y - i] = 'O';
                     break;
@@ -1105,14 +855,12 @@ void explodeBomb(Liste* liste, char** gameGrid, ListePlayer* ListeDesJoueurs){
                     explodeBomb(liste, gameGrid, ListeDesJoueurs);
                 }
             }
-            //check right
             for(int i = 1; i <= actual->range-1; i++){
                 if(gameGrid[actual->x][actual->y + i] == 'X'){
                     break;
                 }
                 else if(gameGrid[actual->x][actual->y + i] == 'M'){
                     randomBonus = rand() % 100;
-                    printf("randomBonus : %d\n", randomBonus);
                     if(randomBonus > tauxDropBonus){
                         gameGrid[actual->x][actual->y + i] = 'S';
                     }else{
@@ -1131,14 +879,12 @@ void explodeBomb(Liste* liste, char** gameGrid, ListePlayer* ListeDesJoueurs){
                     explodeBomb(liste, gameGrid, ListeDesJoueurs);
                 }
             }
-            //check up
             for(int i = 1; i <= actual->range-1; i++){
                 if(gameGrid[actual->x - i][actual->y] == 'X'){
                     break;
                 }
                 else if(gameGrid[actual->x - i][actual->y] == 'M'){
                     randomBonus = rand() % 100;
-                    printf("randomBonus : %d\n", randomBonus);
                     if(randomBonus > tauxDropBonus){
                         gameGrid[actual->x-i][actual->y] = 'S';
                     }else{
@@ -1157,14 +903,12 @@ void explodeBomb(Liste* liste, char** gameGrid, ListePlayer* ListeDesJoueurs){
                     explodeBomb(liste, gameGrid, ListeDesJoueurs);
                 }
             }
-            //check down
             for(int i = 1; i <= actual->range-1; i++){
                 if(gameGrid[actual->x + i][actual->y] == 'X'){
                     break;
                 }
                 else if(gameGrid[actual->x + i][actual->y] == 'M'){
                     randomBonus = rand() % 100;
-                    printf("randomBonus : %d\n", randomBonus);
                     if(randomBonus > tauxDropBonus){
 
                         gameGrid[actual->x + i][actual->y] = 'S';
@@ -1175,7 +919,6 @@ void explodeBomb(Liste* liste, char** gameGrid, ListePlayer* ListeDesJoueurs){
                 }
                 else if(gameGrid[actual->x + i][actual->y] == '1' || gameGrid[actual->x + i][actual->y] == '2' || gameGrid[actual->x + i][actual->y] == '3' || gameGrid[actual->x + i][actual->y] == '4'){
                     int deadPlayer = gameGrid[actual->x + i][actual->y] - '0';
-                    printf("Le joueur %d est mort\n", deadPlayer);
                     modifyPlayer(ListeDesJoueurs, deadPlayer, -1, -1, 0, 0, 0, 0, 0, 0);
                     gameGrid[actual->x + i][actual->y] = 'O';
                     break;
@@ -1207,12 +950,10 @@ void setBombTimerToZero(Liste* liste, int x, int y){
 
 int checkIfPlayerCanMove(char** gameGrid, Map map, char direction, char turn, int isBomb, Liste* ListeDesBombes, ListePlayer* ListeDesJoueurs){
     int id = turn - 48;
-    printf("id : %d\n", id);
     int canMove = 0;
     int a = 0;
     int b = 0;
     int rangeBombPlayer = 0;
-    printf("direction : %c\n", direction);
     switch (direction) {
         case 'Z':
             a = -1;
@@ -1249,7 +990,6 @@ int checkIfPlayerCanMove(char** gameGrid, Map map, char direction, char turn, in
                             gameGrid[i][j] = 'O';
                         }
                         gameGrid[i + a][j + b] = turn;
-                        printf("nouvelle position : %d %d resultat de i = %d + a = %d, j = %d + b = %d \n", i + a, j + b, i, a, j, b);
                         modifyPlayer(ListeDesJoueurs, id, i + a, j + b, -1, 0, 0, 0, 0, 0);
                         canMove = 1;
                         break;
@@ -1264,7 +1004,6 @@ int checkIfPlayerCanMove(char** gameGrid, Map map, char direction, char turn, in
                             gameGrid[i][j] = 'O';
                         }
                         gameGrid[i + a][j + b] = turn;
-                        printf("nouvelle position : %d %d resultat de i = %d + a = %d, j = %d + b = %d \n", i + a, j + b, i, a, j, b);
                         modifyPlayer(ListeDesJoueurs, id, i + a, j + b, -1, 0, 0, 0, 0, 0);
                         getBonus(ListeDesJoueurs, id);
                         canMove = 1;
@@ -1290,7 +1029,6 @@ int checkIfPlayerCanMove(char** gameGrid, Map map, char direction, char turn, in
                             gameGrid[i][j] = 'O';
                         }
                         gameGrid[i + a][j + b] = turn;
-                        printf("nouvelle position : %d %d resultat de i = %d + a = %d, j = %d + b = %d \n", i + a, j + b, i, a, j, b);
                         modifyPlayer(ListeDesJoueurs, id, i + a, j + b, -1, 0, 0, 0, 0, 0);
                         canMove = 1;
                         break;
@@ -1304,7 +1042,6 @@ int checkIfPlayerCanMove(char** gameGrid, Map map, char direction, char turn, in
                             gameGrid[i][j] = 'O';
                         }
                         gameGrid[i + a][j + b] = turn;
-                        printf("nouvelle position : %d %d resultat de i = %d + a = %d, j = %d + b = %d \n", i + a, j + b, i, a, j, b);
                         modifyPlayer(ListeDesJoueurs, id, i + a, j + b, -1, 0, 0, 0, 0, 0);
                         getBonus(ListeDesJoueurs, id);
                         canMove = 1;
@@ -1392,7 +1129,6 @@ int getIsBotPlayer(ListePlayer* ListeDesJoueurs, int id){
     while(actual != NULL){
         if(actual->id == id){
             isBot = actual->isBot;
-            printf("isBot = %d", isBot);
             break;
         }else{
             actual = actual->suivant;
@@ -1401,11 +1137,10 @@ int getIsBotPlayer(ListePlayer* ListeDesJoueurs, int id){
     return isBot;
 }
 
-void checkIfWin(Map map, char** gameGrid){
+void checkIfWin(Map map, char** gameGrid, Liste *ListeDesBombes, ListePlayer* ListeDesJoueurs){
     int nbPlayer = map.players;
     int nbPlayerAlive = 0;
     char possibleWinner;
-    //check grid to see if each char is present, if present increment nbPlayerAlive
     for(int i = 0; i < map.row; i++){
         for(int j = 0; j < map.column; j++){
             if(gameGrid[i][j] == '1' || gameGrid[i][j] == '2' || gameGrid[i][j] == '3' || gameGrid[i][j] == '4'){
@@ -1415,6 +1150,8 @@ void checkIfWin(Map map, char** gameGrid){
         }
     }
     if(nbPlayerAlive == 1){
+        deleteBomb(ListeDesBombes);
+        deletePlayer(ListeDesJoueurs);
         green();
         printf("Le joueur %c a gagné !\n", possibleWinner);
         red();
@@ -1505,17 +1242,14 @@ void getBonus(ListePlayer* liste, char turn){
 int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePlayer* ListeDesJoueurs, int moveLeft){
     char move;
     int nbPlayer = map.players;
-    //malloc two int array to store the position of players (number of player is nbPlayer)
     int *posX = malloc(nbPlayer * sizeof(int));
     int *posY = malloc(nbPlayer * sizeof(int));
     float *distance = malloc(nbPlayer * sizeof(int));
-    //for loop in ListPlayer to store each actual->x and actual->y in the array
     int movebot = moveLeft;
     for(int e = 0; e < movebot; e++){
     Player* actual = ListeDesJoueurs->premier;
     int i = 0;
     int id = turn-48;
-    printf("id = %d", id);
     while(actual != NULL){
         if(actual->id != id){
             posX[i] = actual->x;
@@ -1529,9 +1263,6 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
     }
     int posBotX = 0;
     int posBotY = 0;
-    //convert char turn into int id
-
-    //get the position of the bot stored in actual->x and actual->y where actual->id == id
     actual = ListeDesJoueurs->premier;
     while(actual != NULL){
         if(actual->id == id){
@@ -1543,31 +1274,20 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
             actual = actual->suivant;
         }
     }
-    //malloc an array of nbPlayer int to store the distance between the bot and each player
 
-
-
-    printf("crash ici\n");
-
-    //for loop to calculate the distance between the bot and each player
     for(int j = 0; j < nbPlayer-1; j++){
         distance[j] = sqrt(pow(posX[j] - posBotX, 2) + pow(posY[j] - posBotY, 2));
         printf("distance[%d] = %f\n", j, distance[j]);
     }
-    printf("crash la\n");
-    //make a move to get closer to the closest player (determined by the lowest distance)
     float min = 100.00;
     int index = 0;
-    //for loop to get the lowest distance stored in *distance
     for(int x = 0; x < nbPlayer-1; x++){
         if(distance[x] < min){
             min = distance[x];
             index = x;
         }
     }
-        printf("Le joueur le plus proche est désigné par le caractère %c\n", gameGrid[posX[index]][posY[index]]);
     printf("la distance est de %f\n", min);
-    printf("le joueur le plus proche est en %d %d\n", posX[index], posY[index]);
     if(min == 1){
         printf("Le joueur le plus proche est à une case de distance\n");
         //return 1;
@@ -1575,7 +1295,6 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
     srand(time(NULL));
     int random = rand() % 100;
     int invalidMove;
-    printf("moveLeft = %d\n", moveLeft);
         if ((gameGrid[posBotX - 1][posBotY] == gameGrid[posX[index]][posY[index]]) ||
             (gameGrid[posBotX][posBotY - 1] == gameGrid[posX[index]][posY[index]]) ||
             (gameGrid[posBotX + 1][posBotY] == gameGrid[posX[index]][posY[index]]) ||
@@ -1584,25 +1303,21 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
             if ((gameGrid[posBotX - 1][posBotY] == 'O') &&
                 (gameGrid[posBotX - 1][posBotY - 1] == 'O')) {
                 gameGrid[posBotX][posBotY] = 'B';
-                printf("bombe 1");
                 checkIfPlayerCanMove(gameGrid, map, 'Z', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'G', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
             } else if ((gameGrid[posBotX - 1][posBotY] == 'O') &&
                        (gameGrid[posBotX - 1][posBotY + 1] == 'O')) {
-                printf("bombe 2");
                 checkIfPlayerCanMove(gameGrid, map, 'Z', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'D', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
             } else if ((gameGrid[posBotX + 1][posBotY] == 'O') &&
                        (gameGrid[posBotX + 1][posBotY - 1] == 'O')) {
-                printf("bombe 3");
                 checkIfPlayerCanMove(gameGrid, map, 'S', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'G', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
             } else if ((gameGrid[posBotX + 1][posBotY] == 'O') &&
                        (gameGrid[posBotX + 1][posBotY + 1] == 'O')) {
-                printf("bombe 4");
                 checkIfPlayerCanMove(gameGrid, map, 'S', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'D', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
@@ -1610,21 +1325,16 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
         if (posBotX > posX[index]) {
             if (gameGrid[posBotX - 1][posBotY] == 'O') {
                 checkIfPlayerCanMove(gameGrid, map, 'Z', turn, 0, ListeDesBombes, ListeDesJoueurs);
-                printf("Le bot fait Z\n");
-                printf("moveLeft = %d\n", moveLeft);
                 moveLeft--;
-                printf("moveLeft = %d\n", moveLeft);
-            } else if ((gameGrid[posBotX - 1][posBotY] == 'M') && (gameGrid[posBotX + 1][posBotY] == 'O') && (gameGrid[posBotX + 1][posBotY + 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX - 1][posBotY] == 'M') && (gameGrid[posBotX + 1][posBotY] == 'O') && (gameGrid[posBotX + 1][posBotY + 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'S', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'D', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
-                printf("bombe 5\n");
                 moveLeft = moveLeft -2;
-            } else if ((gameGrid[posBotX - 1][posBotY] == 'M') && (gameGrid[posBotX + 1][posBotY] == 'O') && (gameGrid[posBotX + 1][posBotY - 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX - 1][posBotY] == 'M') && (gameGrid[posBotX + 1][posBotY] == 'O') && (gameGrid[posBotX + 1][posBotY - 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'S', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'Q', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
-                printf("bombe 6\n");
                 moveLeft = moveLeft -2;
             } else {
                 invalidMove = 1;
@@ -1633,22 +1343,16 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
         } else if (posBotX < posX[index]) {
             if (gameGrid[posBotX + 1][posBotY] == 'O') {
                 checkIfPlayerCanMove(gameGrid, map, 'S', turn, 0, ListeDesBombes, ListeDesJoueurs);
-                printf("Le bot fait S\n");
-                printf("moveLeft = %d\n", moveLeft);
                 moveLeft--;
-                printf("moveLeft = %d\n", moveLeft);
-            } else if ((gameGrid[posBotX + 1][posBotY] == 'M') && (gameGrid[posBotX - 1][posBotY] == 'O') && (gameGrid[posBotX - 1][posBotY + 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX + 1][posBotY] == 'M') && (gameGrid[posBotX - 1][posBotY] == 'O') && (gameGrid[posBotX - 1][posBotY + 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'Z', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'D', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
-                //insertBomb(ListeDesBombes, posJ2x, posJ2y, 4, 3);
-                printf("bombe 7\n");
                 moveLeft = moveLeft -2;
-            } else if ((gameGrid[posBotX + 1][posBotY] == 'M') && (gameGrid[posBotX - 1][posBotY] == 'O') && (gameGrid[posBotX - 1][posBotY - 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX + 1][posBotY] == 'M') && (gameGrid[posBotX - 1][posBotY] == 'O') && (gameGrid[posBotX - 1][posBotY - 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'Z', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'Q', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
-                printf("bombe 8\n");
                 moveLeft = moveLeft -2;
             } else {
                 invalidMove = 1;
@@ -1657,21 +1361,16 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
         } else if (posBotY > posY[index]) {
             if (gameGrid[posBotX][posBotY - 1] == 'O') {
                 checkIfPlayerCanMove(gameGrid, map, 'Q', turn, 0, ListeDesBombes, ListeDesJoueurs);
-                printf("Le bot fait Q\n");
-                printf("moveLeft = %d\n", moveLeft);
                 moveLeft--;
-                printf("moveLeft = %d\n", moveLeft);
-            } else if ((gameGrid[posBotX][posBotY - 1] == 'M') && (gameGrid[posBotX][posBotY + 1] == 'O') && (gameGrid[posBotX + 1][posBotY + 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX][posBotY - 1] == 'M') && (gameGrid[posBotX][posBotY + 1] == 'O') && (gameGrid[posBotX + 1][posBotY + 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'D', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'S', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
-                printf("bombe 9\n");
                 moveLeft = moveLeft -2;
-            } else if ((gameGrid[posBotX][posBotY - 1] == 'M') && (gameGrid[posBotX][posBotY + 1] == 'O') && (gameGrid[posBotX - 1][posBotY + 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX][posBotY - 1] == 'M') && (gameGrid[posBotX][posBotY + 1] == 'O') && (gameGrid[posBotX - 1][posBotY + 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'D', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'Z', turn, 0, ListeDesBombes, ListeDesJoueurs);
                 return 1;
-                printf("bombe 10\n");
                 moveLeft = moveLeft -2;
             } else {
                 invalidMove = 1;
@@ -1680,25 +1379,23 @@ int botAction(char **gameGrid, Map map, char turn,Liste *ListeDesBombes, ListePl
         } else if (posBotY < posY[index]) {
             if (gameGrid[posBotX][posBotY + 1] == 'O') {
                 checkIfPlayerCanMove(gameGrid, map, 'D', turn, 0, ListeDesBombes, ListeDesJoueurs);
-                printf("Le bot fait D\n");
-                printf("moveLeft = %d\n", moveLeft);
                 moveLeft--;
-                printf("moveLeft = %d\n", moveLeft);
-            } else if ((gameGrid[posBotX][posBotY + 1] == 'M') && (gameGrid[posBotX][posBotY - 1] == 'O') && (gameGrid[posBotX + 1][posBotY - 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX][posBotY + 1] == 'M') && (gameGrid[posBotX][posBotY - 1] == 'O') && (gameGrid[posBotX + 1][posBotY - 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'Q', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'S', turn, 0, ListeDesBombes, ListeDesJoueurs);
-                printf("bombe 11\n");
                 moveLeft = moveLeft -2;
-            } else if ((gameGrid[posBotX][posBotY + 1] == 'M') && (gameGrid[posBotX][posBotY - 1] == 'O') && (gameGrid[posBotX - 1][posBotY - 1] == 'O') && moveLeft>1) { // Si y a un mur sur la route pose une bombe et s'en va
+            } else if ((gameGrid[posBotX][posBotY + 1] == 'M') && (gameGrid[posBotX][posBotY - 1] == 'O') && (gameGrid[posBotX - 1][posBotY - 1] == 'O') && moveLeft>1) {
                 checkIfPlayerCanMove(gameGrid, map, 'Q', turn, 1, ListeDesBombes, ListeDesJoueurs);
                 checkIfPlayerCanMove(gameGrid, map, 'Z', turn, 0, ListeDesBombes, ListeDesJoueurs);
-                printf("bombe 12\n");
                 moveLeft = moveLeft -2;
             } else {
                 invalidMove = 1;
                 break;
             }
         }
+        decreaseBombTimer(ListeDesBombes, gameGrid,ListeDesJoueurs);
+        //todo : voir pq ça bug checkIfWin(map, gameGrid, ListeDesBombes,ListeDesJoueurs);
+
     }
     free(posX);
     free(posY);
