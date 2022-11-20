@@ -3,7 +3,14 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <netdb.h>
+#include<time.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <sys/socket.h> //for socket APIs
+#include <sys/types.h>
+#include <netinet/in.h>
 
 #define SERVER_PORT 8080
 #define MAX_LINE 4096
