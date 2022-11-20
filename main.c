@@ -5,6 +5,7 @@
 #include <sys/socket.h> //for socket APIs
 #include <sys/types.h>
 #include <netinet/in.h> //structure for storing address information
+#include <time.h>
 
 #define MAX_LEN 256
 
@@ -262,7 +263,79 @@ void startMenu() {
 }
 
 void randomMap() {
+    const char* filename = "mapRandom.txt";
+    const char *str = "X";
+    FILE* output_file = fopen(filename, "w+");
+    if (!output_file) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
     int l;
+    int L;
+    printf("Entrer taille tableau l et L\n");
+    printf("Longeur : \n");
+    scanf("%d", &l);
+    printf("Largeur : \n");
+    scanf("%d", &L);
+    clearTerminal();
+    //int Tab[l][L];
+    srand(time(NULL));
+    for (int i = 0; i <= l; i++) {
+        for (int j = 0; j <= L; j++) {
+            int randomBloc = rand() % 100;
+            if ((i == 1) && (j == 1)) {
+                const char *str = "1";
+                fwrite(str, 1, strlen(str), output_file);
+            } else if ((i == 2) && (j == 1)) {
+                const char *str = "O";
+                fwrite(str, 1, strlen(str), output_file);
+            } else if ((i == 1) && (j == 2)) {
+                const char *str = "O";
+                fwrite(str, 1, strlen(str), output_file);
+            }else if ((i == l-1) && (j == L-1)) {
+                const char *str = "2";
+                fwrite(str, 1, strlen(str), output_file);
+            } else if ((i == l-2) && (j == L-1)) {
+                const char *str = "O";
+                fwrite(str, 1, strlen(str), output_file);
+            } else if ((i == l-1) && (j == L-2)) {
+                const char *str = "O";
+                fwrite(str, 1, strlen(str), output_file);
+            } else if ((i == 0) || (j == 0)) {
+                    //Tab[i][j] == 'X';
+                    const char *str = "X";
+                    fwrite(str, 1, strlen(str), output_file);
+                    if (j==L) {
+                        const char *str = "\n";
+                        fwrite(str, 1, strlen(str), output_file);
+                    }
+            } else if ((i == l) || (j == L)) {
+                //Tab[i][j] = 'X';
+                const char *str = "X";
+                fwrite(str, 1, strlen(str), output_file);
+                if (j==L) {
+                    const char *str = "\n";
+                    fwrite(str, 1, strlen(str), output_file);
+                }
+            } else {
+                if (randomBloc >=0 && randomBloc <= 50) {
+                    const char *str = "M";
+                    fwrite(str, 1, strlen(str), output_file);
+                } else if (randomBloc >50 && randomBloc <= 100) {
+                    const char *str = "O";
+                    fwrite(str, 1, strlen(str), output_file);
+                }
+                //Tab[i][j] == 'O';
+            }
+            //printf("%c", Tab[i][j]);
+            printf("Done Writing!\n");
+        }
+    }
+
+    fclose(output_file);
+    exit(EXIT_SUCCESS);
+
+    /**int l;
     int L;
     printf("Entrer taille tableau l et L\n");
     printf("Longeur : \n");
@@ -282,7 +355,7 @@ void randomMap() {
             }
             printf("%c", Tab[i][j]);
         }
-    }
+    }**/
 }
 
 void multijoueur() {
