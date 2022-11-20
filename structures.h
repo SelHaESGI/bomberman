@@ -1,14 +1,12 @@
-#include "common.h"
-
 //structure for storing address information
-
-typedef struct {
+typedef struct Map Map;
+struct Map {
     int bomb;
     int column;
     int row;
     int players;
     char **grid;
-} Map;
+};
 
 Map map_Test = {
         .bomb = 1,
