@@ -1,4 +1,4 @@
 #!/bin/bash
-gcc main.c -o main
-clear
+[ -f main ] && rm main
+gcc main.c -o main -lm
 ./main
