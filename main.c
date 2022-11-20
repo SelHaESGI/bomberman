@@ -24,6 +24,13 @@ Map map_Test = {
         .players = 2,
 };
 
+Map map_Random = {
+        .bomb = 1,
+        .column = 11,
+        .row = 11,
+        .players = 2,
+};
+
 Map map_1 = {
         .bomb = 1,
         .column = 8,
@@ -227,7 +234,7 @@ void startMenu() {
     printf("4. Quitter\n");
     reset();
     blue();
-    printf("5. Map random (marche pas encore)\n");
+    printf("5. Map random\n");
     reset();
 
     int choice;
@@ -458,7 +465,7 @@ void chooseMap() {
     printAllMaps();
     int turn = 1;
     int *ptrTurn = &turn;
-    printf("Choisissez une map (1 à 4, 4 = mapTest):\n");
+    printf("Choisissez une map (1 à 5, 4 = mapTest, 5 = random):\n");
     int choice;
     int read_chars = scanf("%d", &choice);
     if (read_chars == 0) {
@@ -738,7 +745,77 @@ void chooseMap() {
 
             free(map_Test.grid);
             break;
+        case 5:
+            filename = "mapRandom.txt";
+            fptr = NULL;
 
+            if ((fptr = fopen(filename, "r")) == NULL) {
+                fprintf(stderr, "error opening %s\n", filename);
+                exit(-1);
+            }
+            //MAP 1
+            //ASSIGNATION DE LA MAP 1
+            map_Random.grid = malloc(map_Random.row * sizeof(char *));
+            for (int i = 0; i < map_Random.row; i++)
+                map_Random.grid[i] = malloc(map_Random.column * sizeof(char));
+            //INITIALISATION DE LA MAP 1
+            for (int i = 0; i < map_Random.row; i++)
+                for (int j = 0; j < map_Random.column; j++) {
+                    line = fgetc(fptr);
+                    if (line == EOF) break;
+                    if (line != '\n') {
+                        map_Random.grid[i][j] = line;
+                    } else {
+                        j--;
+                    }
+                }
+            //AFFICHAGE DE LA MAP 1
+//            for (int i = 0; i < map_1.row; i++){
+//                for (int j = 0; j < map_1.column; j++) {
+//                    printMap(map_1.grid[i][j]);
+//                    if( j == map_1.column-1) {
+//                        printf("\n");
+//                    }
+//                }
+//            }
+            fclose(fptr);
+
+
+            //Choix vs ia ou vs player //
+            blue();
+            printf("\n vs IA ou vs Player ?\n");
+            reset();
+            purple();
+            printf("1. vsIA\n");
+            reset();
+            yellow();
+            printf("2. vsPlayer\n");
+            reset();
+            scanf("%d", &vsChoice);
+
+            switch (vsChoice) {
+                case 1:
+                    launchGame(map_Random.grid, map_Random, ptrTurn, vsChoice);
+                    break;
+                case 2:
+                    launchGame(map_Random.grid, map_Random, ptrTurn, vsChoice);
+                    break;
+                default:
+                    scanf("%*[^\n]");
+                    clearTerminal();
+                    red();
+                    printf("Choix invalide\n");
+                    reset();
+                    startMenu();
+                    break;
+            }
+
+            //launchGame(map_1.grid, map_1, ptrTurn);
+            for (int i = 0; i < map_Random.row; i++)
+                free(map_Random.grid[i]);
+
+            free(map_Random.grid);
+            break;
 //        case 4:
 //            //MAP 4
 //            //ASSIGNATION DE LA MAP 4
