@@ -4,7 +4,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-
+#include <sys/socket.h> //for socket APIs
+#include <netinet/in.h> //structure for storing address information
 #include "struct.h"
 #define MAX_LEN 256
 
@@ -31,6 +32,8 @@ int getIsBotPlayer(ListePlayer* ListeDesJoueurs, int id);
 void getBonus(ListePlayer* liste, char turn);
 
 int botAction(char **gameGrid, Map map, char turn, Liste *ListeDesBombes, ListePlayer* ListeDesJoueurs, int moveLeft);
+
+void multijoueur();
 
 void startMenu();
 
@@ -150,6 +153,9 @@ void startMenu() {
     blue();
     printf("3. Générer une map random\n"); // Adrien
     reset();
+    purple();
+    printf("4. Jouer (serveur)\n");
+    reset();
 
     int choice;
     scanf("%d", &choice);
@@ -163,6 +169,9 @@ void startMenu() {
             break;
         case 3:
             randomMap(); // Adrien
+            break;
+        case 4:
+            multijoueur();
             break;
         default:
             scanf("%*[^\n]");
@@ -266,6 +275,100 @@ void randomMap() { // Adrien
     fclose(output_file);
     exit(EXIT_SUCCESS);
     startMenu();
+}
+
+void multijoueur() {
+    blue();
+    printf("1. Démarrer serveur\n");
+    green();
+    printf("2. Rejoindre serveur\n");
+    reset();
+
+    int choice;
+    //int ip = '127.0.0.1';
+    //int ip;
+    int port = 9001;
+    scanf("%d", &choice);
+    clearTerminal();
+    switch (choice) {
+        case 1:
+            blue();
+            printf("Saisir le port assigné (9001 de base)\n");
+            scanf("%d", &port);
+            printf("Port assigné %d\n", port);
+            reset();
+            // create server socket similar to what was done in
+            // client program
+            int servSockD = socket(AF_INET, SOCK_STREAM, 0);
+
+            // string store data to send to client
+            char serMsg[255] = "Message from the server to the "
+                               "client \'Hello Client\' ";
+
+            // define server address
+            struct sockaddr_in servAddr;
+
+            servAddr.sin_family = AF_INET;
+            servAddr.sin_port = htons(port);
+            servAddr.sin_addr.s_addr = INADDR_ANY;
+
+            // bind socket to the specified IP and port
+            bind(servSockD, (struct sockaddr *) &servAddr,
+                 sizeof(servAddr));
+
+            // listen for connections
+            listen(servSockD, 1);
+
+            // integer to hold client socket.
+            int clientSocket = accept(servSockD, NULL, NULL);
+
+            // send's messages to client socket
+            send(clientSocket, serMsg, sizeof(serMsg), 0);
+
+            break;
+        case 2:
+            green();
+            printf("Saisir le port assigné (9001 de base)\n");
+            scanf("%d", &port);
+            printf("Port assigné %d\n", port);
+            //printf("Saisir l'ip'\n");
+            //scanf("%d", &ip);
+            //printf("ip : %d\n", ip);
+            reset();
+
+            int sockD = socket(AF_INET, SOCK_STREAM, 0);
+
+            //struct sockaddr_in servAddr;
+
+            servAddr.sin_family = AF_INET;
+            servAddr.sin_port
+                    = htons(port); // use some unused port number
+            servAddr.sin_addr.s_addr = INADDR_ANY; // ip // INADDR_ANY
+
+            int connectStatus
+                    = connect(sockD, (struct sockaddr *) &servAddr,
+                              sizeof(servAddr));
+
+            if (connectStatus == -1) {
+                printf("Error...\n");
+            } else {
+                char strData[255];
+
+                recv(sockD, strData, sizeof(strData), 0);
+
+                printf("Message: %s\n", strData);
+            }
+
+            break;
+        default:
+            scanf("%*[^\n]");
+            clearTerminal();
+            red();
+            printf("Choix invalide\n");
+            reset();
+            startMenu();
+            break;
+    }
 }
 
 void chooseMap() {
